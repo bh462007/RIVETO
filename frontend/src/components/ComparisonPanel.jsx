@@ -1,9 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useCallback } from 'react';
+import { useFocusTrap, useEscapeKey } from '../hooks/useDialogA11y';
 import { FaTimes, FaCheck, FaStar, FaTrophy, FaPercent, FaInfoCircle } from 'react-icons/fa';
 import { RiPriceTag3Line } from "react-icons/ri";
 import gsap from 'gsap';
 
 const ComparisonPanel = ({ compareList, onClose, removeProduct, currency = "$" }) => {
+    const panelRef = useRef(null);
+    const handleClose = useCallback(() => onClose(), [onClose]);
+
+    useFocusTrap(compareList.length > 0, panelRef);
+    useEscapeKey(compareList.length > 0, handleClose);
 
     React.useEffect(() => {
         gsap.fromTo(".comparison-panel-content",
@@ -90,13 +96,19 @@ const ComparisonPanel = ({ compareList, onClose, removeProduct, currency = "$" }
         <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col justify-end pointer-events-none">
 
             {/* Panel Container - Slide Up Animation */}
-            <div className="comparison-panel-content bg-gray-900/95 backdrop-blur-xl border-t border-gray-700 shadow-2xl rounded-t-3xl pointer-events-auto transform max-h-[85vh] overflow-hidden flex flex-col">
+            <div
+                ref={panelRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="comparison-panel-title"
+                className="comparison-panel-content bg-gray-900/95 backdrop-blur-xl border-t border-gray-700 shadow-2xl rounded-t-3xl pointer-events-auto transform max-h-[85vh] overflow-hidden flex flex-col"
+            >
 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700 bg-gray-800/50">
                     <div className="flex items-center gap-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                            <span className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                        <h2 id="comparison-panel-title" className="text-xl font-bold text-white flex items-center gap-2">
+                            <span className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center" aria-hidden="true">
                                 <RiPriceTag3Line className="text-cyan-400" />
                             </span>
                             Compare ({compareList.length})
@@ -106,10 +118,12 @@ const ComparisonPanel = ({ compareList, onClose, removeProduct, currency = "$" }
                         </span>
                     </div>
                     <button
-                        onClick={onClose}
+                        type="button"
+                        onClick={handleClose}
                         className="p-2 hover:bg-red-500/20 rounded-full group transition-colors"
+                        aria-label="Close product comparison panel"
                     >
-                        <FaTimes className="text-gray-400 group-hover:text-red-400" />
+                        <FaTimes className="text-gray-400 group-hover:text-red-400" aria-hidden="true" />
                     </button>
                 </div>
 
@@ -153,10 +167,12 @@ const ComparisonPanel = ({ compareList, onClose, removeProduct, currency = "$" }
                         {enhancedProducts.map((item) => (
                             <div key={item._id} className="flex flex-col min-w-[200px] relative group hover:bg-gray-800/30 transition-colors">
                                 <button
+                                    type="button"
                                     onClick={() => removeProduct(item._id)}
                                     className="absolute top-2 right-2 z-10 p-1.5 bg-gray-900/80 rounded-full text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-400 hover:bg-gray-800"
+                                    aria-label={`Remove ${item.name} from comparison`}
                                 >
-                                    <FaTimes size={12} />
+                                    <FaTimes size={12} aria-hidden="true" />
                                 </button>
 
                                 {/* Product Header */}

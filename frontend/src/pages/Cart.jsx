@@ -54,8 +54,8 @@ function Cart() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0b1220] flex items-center justify-center pt-20">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="text-center" role="status" aria-live="polite" aria-busy="true">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" aria-hidden="true"></div>
           <p className="text-gray-400">Loading your cart...</p>
         </div>
       </div>
@@ -63,20 +63,21 @@ function Cart() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b1220] pt-24 pb-20 px-4">
+    <main className="min-h-screen bg-[#0b1220] pt-24 pb-20 px-4" aria-labelledby="cart-page-title">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Shopping Cart</h1>
+          <h1 id="cart-page-title" className="text-3xl md:text-4xl font-bold text-white mb-2">Shopping Cart</h1>
           <p className="text-gray-400">Review and manage your items before checkout</p>
         </div>
 
         {/* Back to Shopping Button */}
         <button
+          type="button"
           onClick={() => navigate('/collection')}
           className="flex items-center gap-2 px-5 py-2.5 bg-[#0f172a] hover:bg-[#1a2332] border border-[#1f2a44] text-gray-300 hover:text-white rounded-lg mb-8 transition-all duration-200"
         >
-          <FaArrowLeft className="w-4 h-4" />
+          <FaArrowLeft className="w-4 h-4" aria-hidden="true" />
           Continue Shopping
         </button>
 
@@ -84,13 +85,14 @@ function Cart() {
           {/* Cart Items */}
           <div className="lg:col-span-2">
             {cartData.length === 0 ? (
-              <div className="text-center py-20 bg-[#0f172a] border border-[#1f2a44] rounded-lg">
+              <div className="text-center py-20 bg-[#0f172a] border border-[#1f2a44] rounded-lg" role="status">
                 <div className="w-20 h-20 mx-auto mb-6 bg-[#111c33] border border-[#1f2a44] rounded-full flex items-center justify-center">
                   <FaShoppingBasket className="text-gray-500 text-3xl" />
                 </div>
                 <h3 className="text-slate-900 dark:text-white text-xl font-semibold mb-2">Your cart is empty</h3>
                 <p className="text-slate-600 dark:text-gray-400 mb-6">Looks like you haven't added anything to your cart yet</p>
                 <button
+                  type="button"
                   onClick={() => navigate('/collection')}
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
                 >
@@ -98,13 +100,13 @@ function Cart() {
                 </button>
               </div>
             ) : (
-              <div className="space-y-4">
+              <ul className="space-y-4" aria-label="Cart items">
                 {cartData.map((item, index) => {
                   const productData = product.find(p => p._id === item._id);
 
                   if (!productData) {
                     return (
-                      <div key={index} className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                      <li key={index} className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-red-400 font-medium">Product not available</p>
@@ -117,12 +119,14 @@ function Cart() {
                             <RiDeleteBin6Line className="w-5 h-5" />
                           </button>
                         </div>
-                      </div>
+                      </li>
                     );
                   }
 
+                  const itemLabel = `${productData.name}, size ${item.size}`;
+
                   return (
-                    <div key={index} className="bg-[#0f172a] border border-[#1f2a44] rounded-lg p-5 hover:border-blue-500/40 transition-all duration-200">
+                    <li key={index} className="bg-[#0f172a] border border-[#1f2a44] rounded-lg p-5 hover:border-blue-500/40 transition-all duration-200">
                       <div className="flex flex-col md:flex-row gap-5">
                         {/* Product Image */}
                         <div className="flex-shrink-0">
@@ -158,38 +162,47 @@ function Cart() {
                         {/* Quantity Controls */}
                         <div className="flex flex-col items-end justify-between">
                           <button
+                            type="button"
                             onClick={() => handleQuantityChange(item._id, item.size, 0)}
                             className="text-red-400 hover:text-red-500 transition-colors p-2"
-                            aria-label="Remove item"
+                            aria-label={`Remove ${itemLabel} from cart`}
                           >
-                            <RiDeleteBin6Line className="w-5 h-5" />
+                            <RiDeleteBin6Line className="w-5 h-5" aria-hidden="true" />
                           </button>
 
-                          <div className="flex items-center gap-3 bg-slate-200 dark:bg-gray-700 rounded-xl p-2">
+                          <div
+                            className="flex items-center gap-3 bg-slate-200 dark:bg-gray-700 rounded-xl p-2"
+                            role="group"
+                            aria-label={`Quantity for ${itemLabel}`}
+                          >
                             <button
+                              type="button"
                               onClick={() => handleQuantityChange(item._id, item.size, item.quantity - 1)}
                               className="w-8 h-8 flex items-center justify-center bg-slate-300 dark:bg-gray-600 hover:bg-slate-400 dark:hover:bg-gray-500 rounded-lg transition-colors"
-                              aria-label="Decrease quantity"
+                              aria-label={`Decrease quantity for ${itemLabel}`}
                             >
-                              <RiSubtractLine className="w-4 h-4 text-gray-400" />
+                              <RiSubtractLine className="w-4 h-4 text-gray-400" aria-hidden="true" />
                             </button>
 
-                            <span className="w-8 text-center font-bold text-slate-900 dark:text-white">{item.quantity}</span>
+                            <span className="w-8 text-center font-bold text-slate-900 dark:text-white" aria-live="polite" aria-atomic="true">
+                              {item.quantity}
+                            </span>
 
                             <button
+                              type="button"
                               onClick={() => handleQuantityChange(item._id, item.size, item.quantity + 1)}
                               className="w-8 h-8 flex items-center justify-center bg-slate-300 dark:bg-gray-600 hover:bg-slate-400 dark:hover:bg-gray-500 rounded-lg transition-colors"
-                              aria-label="Increase quantity"
+                              aria-label={`Increase quantity for ${itemLabel}`}
                             >
-                              <RiAddLine className="w-4 h-4 text-gray-400" />
+                              <RiAddLine className="w-4 h-4 text-gray-400" aria-hidden="true" />
                             </button>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             )}
           </div>
 
@@ -205,6 +218,7 @@ function Cart() {
                 <CartTotal />
 
                 <button
+                  type="button"
                   className={`w-full mt-6 py-3.5 rounded-lg font-semibold transition-all duration-200 ${cartData.length > 0
                       ? 'bg-blue-600 hover:bg-blue-700 text-white'
                       : 'bg-[#111c33] border border-[#1f2a44] text-gray-500 cursor-not-allowed'
@@ -215,6 +229,7 @@ function Cart() {
                     }
                   }}
                   disabled={cartData.length === 0}
+                  aria-disabled={cartData.length === 0}
                 >
                   {cartData.length > 0 ? 'Proceed to Checkout' : 'Add items to checkout'}
                 </button>
@@ -257,7 +272,7 @@ function Cart() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

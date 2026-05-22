@@ -90,6 +90,13 @@ function Card({ name, image, id, price, showQuickActions = true, badge, badgeCol
     navigate(`/productdetail/${id}`);
   };
 
+  const handleCardKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      navigate(`/productdetail/${id}`);
+    }
+  };
+
   // Generate stable random values based on product id
   const { rating, reviewCount, discountPercent, dispatchHours } = useMemo(() => {
     // Use id as seed for deterministic random values
@@ -106,14 +113,17 @@ function Card({ name, image, id, price, showQuickActions = true, badge, badgeCol
   const savingsAmount = (originalPrice - price).toFixed(0);
 
   return (
-    <div
+    <article
       ref={cardRef}
       className={`relative bg-white dark:bg-[#121826] rounded-2xl overflow-hidden cursor-pointer group border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl hover:border-[#2563EB]/50 ${isFeatured ? 'sm:col-span-2 sm:row-span-1' : ''
         }`}
       onClick={() => navigate(`/productdetail/${id}`)}
+      onKeyDown={handleCardKeyDown}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
+      tabIndex={0}
+      aria-label={`${name}, ${currency}${price.toLocaleString()}. Press Enter to view details.`}
     >
       {/* Removed dynamic glow effect for commerce stability */}
 
@@ -157,9 +167,11 @@ function Card({ name, image, id, price, showQuickActions = true, badge, badgeCol
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
           }`}>
           <button
+            type="button"
             onClick={handleQuickView}
             className="px-6 py-3 bg-white text-gray-900 rounded-full font-semibold text-sm hover:bg-gray-100 transition-all duration-300 shadow-xl transform hover:scale-105"
             style={{ fontFamily: 'Inter, sans-serif' }}
+            aria-label={`Quick view ${name}`}
           >
             Quick View
           </button>
@@ -168,10 +180,11 @@ function Card({ name, image, id, price, showQuickActions = true, badge, badgeCol
         {/* Wishlist Icon - Top Right on Hover */}
         {showQuickActions && (
           <button
+            type="button"
             onClick={handleAddToWishlist}
             className={`absolute top-4 right-4 w-11 h-11 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-rose-400 shadow-md ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
               }`}
-            aria-label="Add to wishlist"
+            aria-label={`Add ${name} to wishlist`}
           >
             <FaHeart className="text-gray-700 dark:text-gray-300 text-sm hover:text-rose-500 transition-colors" />
           </button>
@@ -180,13 +193,14 @@ function Card({ name, image, id, price, showQuickActions = true, badge, badgeCol
         {/* Compare Icon - Top Left on Hover */}
         {showQuickActions && onCompare && (
           <button
+            type="button"
             onClick={handleCompare}
             className={`absolute top-4 left-4 w-11 h-11 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 border shadow-md ${isCompared
                 ? 'bg-[#2563EB] border-[#2563EB] hover:bg-[#1d4ed8]'
                 : 'bg-white/90 dark:bg-gray-800/90 border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-400'
               } ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
               }`}
-            aria-label={isCompared ? "Remove from compare" : "Add to compare"}
+            aria-label={isCompared ? `Remove ${name} from compare` : `Add ${name} to compare`}
           >
             <FaExchangeAlt className={`text-sm transition-colors ${isCompared ? 'text-white' : 'text-gray-700 dark:text-gray-300 hover:text-blue-500'
               }`} />
@@ -238,8 +252,10 @@ function Card({ name, image, id, price, showQuickActions = true, badge, badgeCol
 
         {/* Layer 2: Commitment CTA (Secondary Weight) */}
         <button
+          type="button"
           onClick={handleAddToCart}
           disabled={isAddingToCart}
+          aria-label={`Add ${name} to cart`}
           className={`w-full py-2.5 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-sm border ${isAddingToCart
               ? 'bg-green-600 text-white border-green-600 hover:bg-green-700'
               : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:border-[#2563EB] hover:text-[#2563EB] dark:hover:border-[#2563EB] dark:hover:text-[#2563EB]'
@@ -266,7 +282,7 @@ function Card({ name, image, id, price, showQuickActions = true, badge, badgeCol
           boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.3)'
         }}
       />
-    </div>
+    </article>
   );
 }
 

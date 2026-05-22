@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
+import React, { useContext, useEffect, useState, useRef, useCallback } from 'react';
+import { useFocusTrap, useEscapeKey } from '../hooks/useDialogA11y';
 import { FaChevronRight, FaChevronDown, FaFilter, FaTimes, FaSearch, FaStar } from "react-icons/fa";
 import { RiPriceTag3Line, RiArrowUpDownLine } from "react-icons/ri";
 import { toast } from 'react-toastify';
@@ -84,6 +85,7 @@ const FilterContent = ({
     <div className="space-y-8">
       {activeFilters > 0 && (
         <button
+          type="button"
           onClick={clearAllFilters}
           className='w-full text-sm px-4 py-2.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-xl transition-all border border-red-500/20'
         >
@@ -98,13 +100,21 @@ const FilterContent = ({
           Price Range
         </h3>
         <div className='px-1'>
+          <label htmlFor="collections-price-range" className="sr-only">
+            Maximum price filter
+          </label>
           <input
+            id="collections-price-range"
             type="range"
             min="0"
             max="2000"
             value={priceRange[1]}
             onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
             className='w-full h-2 bg-slate-300 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb'
+            aria-valuemin={0}
+            aria-valuemax={2000}
+            aria-valuenow={priceRange[1]}
+            aria-label={`Maximum price ${priceRange[1]} dollars`}
           />
          <div className='flex justify-between mt-3'>
   <span className='text-slate-700 dark:text-gray-400 text-sm font-medium'>
@@ -125,7 +135,9 @@ const FilterContent = ({
           {categories.map((cat, i) => (
             <button
               key={i}
+              type="button"
               onClick={() => toggleCategory(cat)}
+              aria-pressed={category.includes(cat)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${category.includes(cat)
                 ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/30'
                 : 'bg-white/5 text-gray-300 hover:bg-white/10 border border-gray-700/50'
@@ -146,7 +158,9 @@ const FilterContent = ({
           {subCategories.map((sub, i) => (
             <button
               key={i}
+              type="button"
               onClick={() => toggleSubCategory(sub)}
+              aria-pressed={subCategory.includes(sub)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${subCategory.includes(sub)
                 ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/30'
                 : 'bg-white/5 text-gray-300 hover:bg-white/10 border border-gray-700/50'
@@ -165,7 +179,10 @@ const FilterContent = ({
           {ratings.map((rating, i) => (
             <button
               key={i}
+              type="button"
               onClick={() => toggleRating(rating)}
+              aria-pressed={selectedRatings.includes(rating)}
+              aria-label={`${rating} stars and up`}
               className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 ${selectedRatings.includes(rating)
                 ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20'
                 : 'bg-white/5 text-gray-300 hover:bg-white/10 border border-gray-700/50'
@@ -204,6 +221,12 @@ function Collections() {
 
   const contentRef = useRef(null);
   const filterRef = useRef(null);
+  const filterDrawerRef = useRef(null);
+
+  const closeFilterDrawer = useCallback(() => setShowFilter(false), []);
+
+  useFocusTrap(showFilter, filterDrawerRef);
+  useEscapeKey(showFilter, closeFilterDrawer);
 
   // Extract unique categories and subcategories
   const categories = [...new Set(product.map(item => item.category))].filter(Boolean);
@@ -381,13 +404,14 @@ function Collections() {
 
   return (
     <>
-      <div className='min-h-screen bg-gradient-to-br from-slate-100 via-white to-sky-100 dark:from-gray-900 dark:via-[#0f172a] dark:to-[#0c4a6e] pt-24 pb-20 overflow-x-hidden'>
+      <main className='min-h-screen bg-gradient-to-br from-slate-100 via-white to-sky-100 dark:from-gray-900 dark:via-[#0f172a] dark:to-[#0c4a6e] pt-24 pb-20 overflow-x-hidden' aria-labelledby="collections-page-title">
         {/* Main Content */}
         <div className='max-w-7xl mx-auto px-4 lg:px-8 flex flex-col lg:flex-row gap-8'>
           {/* Filter Sidebar - Desktop Only */}
           <div
             ref={filterRef}
             className='hidden lg:block lg:w-80 bg-white/90 dark:bg-gray-800/50 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-gray-700 p-6 sticky top-24 h-fit'
+            aria-label="Product filters"
           >
             <div className='flex items-center justify-between mb-6'>
               <h2 className='text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2'>
@@ -416,19 +440,24 @@ function Collections() {
           <div className='flex-1 min-w-0' ref={contentRef}>
             {/* Header */}
             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 p-5 bg-white/90 dark:bg-gray-800/50 rounded-2xl backdrop-blur-md border border-slate-200 dark:border-gray-700'>
-              <h1 className='text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight'>ALL <span className='text-cyan-500 dark:text-cyan-400'>COLLECTIONS</span></h1>
+              <h1 id="collections-page-title" className='text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight'>ALL <span className='text-cyan-500 dark:text-cyan-400'>COLLECTIONS</span></h1>
               <div className='flex items-center gap-3'>
                 {/* Mobile Filter Toggle */}
                 <button
+                  type="button"
                   onClick={() => setShowFilter(!showFilter)}
                   className='lg:hidden flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-gray-700 rounded-lg text-slate-800 dark:text-white text-sm font-medium'
+                  aria-expanded={showFilter}
+                  aria-controls="collections-filter-drawer"
                 >
-                  <FaFilter className='text-sm' />
+                  <FaFilter className='text-sm' aria-hidden="true" />
                   Filters {activeFilters > 0 && `(${activeFilters})`}
                 </button>
                 {/* Sort Dropdown */}
                 <div className='relative'>
+                  <label htmlFor="collections-sort" className="sr-only">Sort products</label>
                   <select
+                    id="collections-sort"
                     value={sortType}
                     onChange={(e) => setSortType(e.target.value)}
                     className='appearance-none bg-white dark:bg-gray-700 text-slate-900 dark:text-white px-4 py-2 rounded-lg pr-9 focus:outline-none focus:ring-2 focus:ring-cyan-500 border border-slate-300 dark:border-gray-600 text-sm'
@@ -460,9 +489,12 @@ function Collections() {
               </div>
             ) : filterProduct.length > 0 ? (
               <>
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
+                <p className="sr-only" role="status" aria-live="polite">
+                  Showing {filterProduct.length} product{filterProduct.length === 1 ? '' : 's'}
+                </p>
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5' role="list" aria-label="Product results">
                   {filterProduct.map((item, index) => (
-                    <div key={item._id} className='collection-item'>
+                    <div key={item._id} className='collection-item' role="listitem">
                       <Card
                         id={item._id}
                         name={item.name}
@@ -513,9 +545,15 @@ function Collections() {
         {showFilter && (
           <div
             className='fixed inset-0 z-50 backdrop-blur-sm bg-black/60 transition-all duration-300'
-            onClick={() => setShowFilter(false)}
+            onClick={closeFilterDrawer}
+            role="presentation"
           >
             <div
+              id="collections-filter-drawer"
+              ref={filterDrawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="filter-drawer-title"
               className='absolute top-0 right-0 h-full w-full max-w-md bg-gray-900/95 backdrop-blur-xl border-l border-gray-700/50 shadow-2xl overflow-y-auto transform transition-transform duration-300'
               onClick={(e) => e.stopPropagation()}
               style={{
@@ -524,7 +562,7 @@ function Collections() {
             >
               <div className='sticky top-0 bg-gray-900/95 backdrop-blur-xl border-b border-gray-700/50 p-6 z-10'>
                 <div className='flex items-center justify-between'>
-                  <h2 className='text-2xl font-bold text-white flex items-center gap-3'>
+                  <h2 id="filter-drawer-title" className='text-2xl font-bold text-white flex items-center gap-3'>
                     <FaFilter className='text-cyan-400' />
                     Filters
                     {activeFilters > 0 && (
@@ -532,10 +570,12 @@ function Collections() {
                     )}
                   </h2>
                   <button
-                    onClick={() => setShowFilter(false)}
+                    type="button"
+                    onClick={closeFilterDrawer}
                     className='p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-all'
+                    aria-label="Close filters"
                   >
-                    <FaTimes className='text-xl' />
+                    <FaTimes className='text-xl' aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -581,7 +621,7 @@ function Collections() {
             </div>
           </div>
         )}
-      </div>
+      </main>
 
       {/* Footer */}
       <Footer />

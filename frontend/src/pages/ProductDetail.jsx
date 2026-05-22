@@ -1,22 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { shopDataContext } from '../context/ShopContext';
 import RelatedProduct from '../components/RelatedProduct';
 import { toast } from 'react-toastify';
 import { authDataContext } from '../context/AuthContext';
-
-
 import axios from 'axios';
-
 import 'react-toastify/dist/ReactToastify.css';
-
 import {
   FaShoppingCart,
   FaHeart,
   FaShare,
   FaStar,
   FaChevronLeft,
-  FaChevronRight
+  FaChevronRight,
 } from 'react-icons/fa';
 
 function ProductDetail() {
@@ -24,118 +20,130 @@ function ProductDetail() {
   const { productId } = useParams();
 
   const {
-  product,
-  pagination,
-  loadingProducts,
-  currency,
-  addtoCart,
-  addToWishlist
-} = useContext(shopDataContext);
- 
+    product,
+    pagination,
+    loadingProducts,
+    currency,
+    addtoCart,
+    addToWishlist,
+  } = useContext(shopDataContext);
+
   const [productData, setProductData] = useState(null);
   const [selectedImage, setSelectedImage] = useState('');
   const [size, setSize] = useState('');
   const [activeTab, setActiveTab] = useState('description');
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const sizeGroupRef = useRef(null);
 
-  // reviews
   const [reviews, setReviews] = useState([]);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
 
-  // fetch reviews
+  const handleSizeKeyDown = (event, sizes) => {
+    const currentIndex = sizes.indexOf(size);
+    if (currentIndex === -1) return;
+
+    let nextIndex = currentIndex;
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      event.preventDefault();
+      nextIndex = currentIndex >= sizes.length - 1 ? 0 : currentIndex + 1;
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      nextIndex = currentIndex <= 0 ? sizes.length - 1 : currentIndex - 1;
+    } else {
+      return;
+    }
+
+    setSize(sizes[nextIndex]);
+    const buttons = sizeGroupRef.current?.querySelectorAll('[role="radio"]');
+    buttons?.[nextIndex]?.focus();
+  };
+
+  const handleTabKeyDown = (event, tabList) => {
+    const tabIds = tabList.map((t) => t.id);
+    const currentIndex = tabIds.indexOf(activeTab);
+    let nextIndex = currentIndex;
+
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      nextIndex = currentIndex >= tabIds.length - 1 ? 0 : currentIndex + 1;
+    } else if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      nextIndex = currentIndex <= 0 ? tabIds.length - 1 : currentIndex - 1;
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      nextIndex = tabIds.length - 1;
+    } else {
+      return;
+    }
+
+    setActiveTab(tabIds[nextIndex]);
+    document.getElementById(`tab-${tabIds[nextIndex]}`)?.focus();
+  };
+
   const fetchReviews = async () => {
     try {
-
-      const response = await axios.get(
-        `${serverUrl}/api/review/${productId}`
-      );
-
+      const response = await axios.get(`${serverUrl}/api/review/${productId}`);
       setReviews(response.data);
-
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    const found = (product || []).find(item => item._id === productId);
+    const found = (product || []).find((item) => item._id === productId);
     if (found) {
       setProductData(found);
       setSelectedImage(found.image1);
     }
 
     fetchReviews();
-
   }, [productId, product]);
 
-  // add to cart
   const handleAddToCart = () => {
-
     if (!size) {
-      toast.warning(
-        'Please select a size before adding to cart.'
-      );
+      toast.warning('Please select a size before adding to cart.');
       return;
     }
 
-    addtoCart(
-      productData._id,
-      size,
-      quantity
-    );
-
-    toast.success(
-      `${quantity} x ${productData.name} added to cart!`
-    );
+    addtoCart(productData._id, size, quantity);
+    toast.success(`${quantity} x ${productData.name} added to cart!`);
   };
 
-  // wishlist
   const handleAddToWishlist = () => {
     addToWishlist(productData._id);
-    toast.success('Added to wishlist! 💖');
+    toast.success('Added to wishlist!');
   };
 
-  // share
   const handleShare = async () => {
-
     if (navigator.share) {
-
       try {
-
         await navigator.share({
           title: productData.name,
           text: `Check out ${productData.name} on our store!`,
           url: window.location.href,
         });
-
         toast.success('Product shared successfully!');
-
       } catch (error) {
         console.log(error);
       }
-
     } else {
-
-      navigator.clipboard.writeText(
-        window.location.href
-      );
-
+      navigator.clipboard.writeText(window.location.href);
       toast.info('Link copied to clipboard!');
     }
   };
 
-  // submit review
   const handleSubmitReview = async () => {
-
     if (!reviewComment) {
-      toast.warning("Please write a review");
+      toast.warning('Please write a review');
       return;
     }
 
     try {
-
       await axios.post(
         `${serverUrl}/api/review/add`,
         {
@@ -143,83 +151,76 @@ function ProductDetail() {
           rating: reviewRating,
           comment: reviewComment,
         },
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true },
       );
 
-      toast.success("Review added successfully");
-
-      setReviewComment("");
+      toast.success('Review added successfully');
+      setReviewComment('');
       setReviewRating(5);
-
       fetchReviews();
-
     } catch (error) {
       console.log(error);
-      toast.error("Failed to add review");
+      toast.error('Failed to add review');
     }
   };
 
-  // image navigation
   const nextImage = () => {
-
-    const images = [
+    const imgs = [
       productData.image1,
       productData.image2,
       productData.image3,
-      productData.image4
+      productData.image4,
     ].filter(Boolean);
 
-    setCurrentImageIndex(
-      (prev) => (prev + 1) % images.length
-    );
-
-    setSelectedImage(
-      images[(currentImageIndex + 1) % images.length]
-    );
+    setCurrentImageIndex((prev) => (prev + 1) % imgs.length);
+    setSelectedImage(imgs[(currentImageIndex + 1) % imgs.length]);
   };
 
   const prevImage = () => {
-
-    const images = [
+    const imgs = [
       productData.image1,
       productData.image2,
       productData.image3,
-      productData.image4
+      productData.image4,
     ].filter(Boolean);
 
-    setCurrentImageIndex(
-      (prev) =>
-        (prev - 1 + images.length) % images.length
-    );
-
+    setCurrentImageIndex((prev) => (prev - 1 + imgs.length) % imgs.length);
     setSelectedImage(
-      images[
-      (currentImageIndex - 1 + images.length)
-      % images.length
-      ]
+      imgs[(currentImageIndex - 1 + imgs.length) % imgs.length],
     );
   };
 
   if (!productData) {
-   const allPagesLoaded = !loadingProducts && pagination.page >= pagination.pages && product.length > 0;
-   if (allPagesLoaded) {
-     return (
-       <div className="min-h-screen bg-gradient-to-br from-slate-100 to-sky-100 dark:from-[#0f172a] dark:to-[#0c4a6e] flex items-center justify-center">
-         <div className="text-slate-900 dark:text-white text-center">
-           <p className="text-lg">Product not found.</p>
-         </div>
-       </div>
-     );
-   }
-   return (
-     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-sky-100 dark:from-[#0f172a] dark:to-[#0c4a6e] flex items-center justify-center">
-       <div className="text-slate-900 dark:text-white text-center">
-         <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-         <p className="text-lg">Loading product details...</p>
-       </div>
-     </div>
+    const allPagesLoaded =
+      !loadingProducts &&
+      pagination.page >= pagination.pages &&
+      product.length > 0;
+
+    if (allPagesLoaded) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-100 to-sky-100 dark:from-[#0f172a] dark:to-[#0c4a6e] flex items-center justify-center">
+          <div className="text-slate-900 dark:text-white text-center" role="status">
+            <p className="text-lg">Product not found.</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 to-sky-100 dark:from-[#0f172a] dark:to-[#0c4a6e] flex items-center justify-center">
+        <div
+          className="text-slate-900 dark:text-white text-center"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <div
+            className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+            aria-hidden="true"
+          />
+          <p className="text-lg">Loading product details...</p>
+        </div>
+      </div>
     );
   }
 
@@ -227,148 +228,146 @@ function ProductDetail() {
     productData.image1,
     productData.image2,
     productData.image3,
-    productData.image4
+    productData.image4,
   ].filter(Boolean);
 
   const rating = productData.rating || 0;
   const reviewCount = reviews.length || 0;
 
+  const tabs = [
+    { id: 'description', label: 'Description' },
+    { id: 'specifications', label: 'Specifications' },
+    { id: 'reviews', label: `Reviews (${reviewCount})` },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-sky-100 dark:from-[#0f172a] dark:to-[#0c4a6e]">
-
-      {/* MAIN SECTION */}
+    <main
+      className="min-h-screen bg-gradient-to-br from-slate-100 to-sky-100 dark:from-[#0f172a] dark:to-[#0c4a6e]"
+      aria-labelledby="product-title"
+    >
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-20 pt-32">
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-
-          {/* IMAGE GALLERY */}
-          <div>
-
+          <section aria-label="Product images">
             <div className="relative rounded-lg overflow-hidden border border-[#1f2a44]">
-
               <img
                 src={selectedImage}
-                alt={productData.name}
+                alt={`${productData.name} — image ${currentImageIndex + 1} of ${images.length}`}
                 className="w-full h-96 lg:h-[500px] object-cover"
               />
 
               {images.length > 1 && (
                 <>
                   <button
+                    type="button"
                     onClick={prevImage}
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center"
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-all"
+                    aria-label="Previous product image"
                   >
-                    <FaChevronLeft className="text-white" />
+                    <FaChevronLeft className="text-white" aria-hidden="true" />
                   </button>
-
                   <button
+                    type="button"
                     onClick={nextImage}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-all"
+                    aria-label="Next product image"
                   >
-                    <FaChevronRight className="text-white" />
+                    <FaChevronRight className="text-white" aria-hidden="true" />
                   </button>
+                  <p
+                    className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full text-white text-sm"
+                    aria-live="polite"
+                  >
+                    {currentImageIndex + 1} / {images.length}
+                  </p>
                 </>
               )}
-
             </div>
 
-            {/* thumbnails */}
-            <div className="flex gap-3 mt-4 overflow-x-auto">
-
+            <div
+              className="flex gap-3 mt-4 overflow-x-auto"
+              role="list"
+              aria-label="Product image thumbnails"
+            >
               {images.map((img, i) => (
-
-                <img
+                <button
                   key={i}
-                  src={img}
-                  alt={`Thumbnail ${i + 1}`}
-                  className={`w-16 h-16 object-cover rounded-lg cursor-pointer transition-all duration-300 border-2 ${
-                    selectedImage === img
-                      ? 'border-blue-500'
-                      : 'border-[#1f2a44] opacity-70 hover:opacity-100'
-                  }`}
+                  type="button"
+                  role="listitem"
                   onClick={() => {
                     setSelectedImage(img);
                     setCurrentImageIndex(i);
                   }}
-                />
+                  aria-label={`View image ${i + 1} of ${images.length}`}
+                  aria-current={selectedImage === img ? 'true' : undefined}
+                  className={`w-16 h-16 rounded-lg cursor-pointer transition-all duration-300 border-2 overflow-hidden p-0 ${
+                    selectedImage === img
+                      ? 'border-blue-500'
+                      : 'border-[#1f2a44] opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img} alt="" className="w-full h-full object-cover" />
+                </button>
               ))}
-
             </div>
+          </section>
 
-          </div>
-
-          {/* PRODUCT INFO */}
           <div className="space-y-6 text-slate-900 dark:text-white">
-
-            <div className="text-sm text-slate-500">
-              Home / {productData.category} / {productData.subCategory}
-            </div>
+            <nav className="text-sm text-slate-500 dark:text-gray-400" aria-label="Breadcrumb">
+              Home / {productData.category} / {productData.subCategory} /{' '}
+              <span className="text-cyan-500 dark:text-cyan-400">{productData.name}</span>
+            </nav>
 
             <div>
-
-              <h1 className="text-4xl font-bold mb-3">
+              <h1 id="product-title" className="text-4xl font-bold mb-3">
                 {productData.name}
               </h1>
-
-              <div className="flex items-center gap-3">
-
-                <div className="flex items-center gap-1">
-
+              <div
+                className="flex items-center gap-3"
+                aria-label={`Rated ${rating} out of 5 from ${reviewCount} reviews`}
+              >
+                <div className="flex items-center gap-1" aria-hidden="true">
                   {[...Array(5)].map((_, i) => (
-
                     <FaStar
                       key={i}
                       className={
-                        i < Math.floor(rating)
-                          ? 'text-yellow-400'
-                          : 'text-gray-400'
+                        i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-400'
                       }
                     />
-
                   ))}
-
                 </div>
-
-                <span className="text-cyan-500">
-                  {rating}
-                </span>
-
-                <span className="text-gray-500">
-                  ({reviewCount} reviews)
-                </span>
-
+                <span className="text-cyan-500">{rating}</span>
+                <span className="text-gray-500">({reviewCount} reviews)</span>
               </div>
-
             </div>
 
-            {/* price */}
             <div className="flex items-center gap-4">
-
               <p className="text-3xl font-bold">
                 {currency}
                 {productData.price.toLocaleString()}
               </p>
-
             </div>
 
-            {/* description */}
             <p className="text-slate-700 dark:text-gray-300 leading-relaxed">
               {productData.description}
             </p>
 
-            {/* sizes */}
             <div>
-
-              <label className="block mb-3 font-semibold">
+              <span id="size-label" className="block mb-3 font-semibold">
                 Select Size
-              </label>
-
-              <div className="flex gap-3 flex-wrap">
-
+              </span>
+              <div
+                ref={sizeGroupRef}
+                role="radiogroup"
+                aria-labelledby="size-label"
+                className="flex gap-3 flex-wrap"
+                onKeyDown={(e) => handleSizeKeyDown(e, productData.sizes || [])}
+              >
                 {productData.sizes?.map((s, i) => (
-
                   <button
                     key={i}
+                    type="button"
+                    role="radio"
+                    aria-checked={size === s}
                     onClick={() => setSize(s)}
                     className={`px-5 py-2 rounded-lg border ${
                       size === s
@@ -378,113 +377,92 @@ function ProductDetail() {
                   >
                     {s}
                   </button>
-
                 ))}
-
               </div>
-
             </div>
 
-            {/* quantity */}
             <div>
-
-              <label className="block mb-3 font-semibold">
+              <span id="quantity-label" className="block mb-3 font-semibold">
                 Quantity
-              </label>
-
-              <div className="flex items-center gap-3">
-
+              </span>
+              <div
+                className="flex items-center gap-3"
+                role="group"
+                aria-labelledby="quantity-label"
+              >
                 <button
-                  onClick={() =>
-                    setQuantity(
-                      Math.max(1, quantity - 1)
-                    )
-                  }
-                  className="w-10 h-10 bg-gray-300 rounded-lg"
+                  type="button"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-lg"
+                  aria-label="Decrease quantity"
                 >
                   -
                 </button>
-
-                <span>{quantity}</span>
-
+                <span aria-live="polite" aria-atomic="true">
+                  {quantity}
+                </span>
                 <button
-                  onClick={() =>
-                    setQuantity(quantity + 1)
-                  }
-                  className="w-10 h-10 bg-gray-300 rounded-lg"
+                  type="button"
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-lg"
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>
-
               </div>
-
             </div>
 
-            {/* cart */}
             <button
+              type="button"
               onClick={handleAddToCart}
               className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-lg flex items-center justify-center gap-3"
             >
-              <FaShoppingCart />
-
-              Add to Cart -
-              {currency}
+              <FaShoppingCart aria-hidden="true" />
+              Add to Cart - {currency}
               {(productData.price * quantity).toLocaleString()}
             </button>
 
-            {/* wishlist/share */}
             <div className="flex gap-3">
-
               <button
+                type="button"
                 onClick={handleAddToWishlist}
                 className="flex-1 bg-gray-800 text-white py-3 rounded-lg flex items-center justify-center gap-2"
+                aria-label="Add to wishlist"
               >
-                <FaHeart />
+                <FaHeart aria-hidden="true" />
                 Wishlist
               </button>
-
               <button
+                type="button"
                 onClick={handleShare}
                 className="w-14 h-14 bg-gray-800 rounded-lg flex items-center justify-center"
+                aria-label="Share product"
               >
-                <FaShare className="text-white" />
+                <FaShare className="text-white" aria-hidden="true" />
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       </div>
 
-      {/* TABS */}
       <div className="py-16">
-
         <div className="max-w-7xl mx-auto px-4">
-
-          <div className="flex gap-6 border-b border-gray-400 mb-8">
-
-            {[
-              {
-                id: 'description',
-                label: 'Description'
-              },
-              {
-                id: 'specifications',
-                label: 'Specifications'
-              },
-              {
-                id: 'reviews',
-                label: `Reviews (${reviewCount})`
-              }
-            ].map((tab) => (
-
+          <div
+            role="tablist"
+            aria-label="Product information"
+            className="flex gap-6 border-b border-gray-400 mb-8"
+            onKeyDown={(e) => handleTabKeyDown(e, tabs)}
+          >
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() =>
-                  setActiveTab(tab.id)
-                }
+                type="button"
+                role="tab"
+                id={`tab-${tab.id}`}
+                aria-selected={activeTab === tab.id}
+                aria-controls={`panel-${tab.id}`}
+                tabIndex={activeTab === tab.id ? 0 : -1}
+                onClick={() => setActiveTab(tab.id)}
                 className={`pb-3 ${
                   activeTab === tab.id
                     ? 'text-cyan-500 border-b-2 border-cyan-500'
@@ -493,164 +471,135 @@ function ProductDetail() {
               >
                 {tab.label}
               </button>
-
             ))}
-
           </div>
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-8">
-
-            {/* DESCRIPTION */}
             {activeTab === 'description' && (
-              <p className="text-slate-700 dark:text-gray-300">
-                {productData.description}
-              </p>
-            )}
-
-            {/* SPECIFICATIONS */}
-            {activeTab === 'specifications' && (
-              <div className="space-y-2 text-slate-700 dark:text-gray-300">
-
-                <p>
-                  Material: Premium Fabric
+              <div
+                role="tabpanel"
+                id="panel-description"
+                aria-labelledby="tab-description"
+              >
+                <p className="text-slate-700 dark:text-gray-300">
+                  {productData.description}
                 </p>
-
-                <p>
-                  Weight: 0.5 kg
-                </p>
-
-                <p>
-                  Quality: Excellent
-                </p>
-
               </div>
             )}
 
-            {/* REVIEWS */}
+            {activeTab === 'specifications' && (
+              <div
+                role="tabpanel"
+                id="panel-specifications"
+                aria-labelledby="tab-specifications"
+                className="space-y-2 text-slate-700 dark:text-gray-300"
+              >
+                <p>Material: Premium Fabric</p>
+                <p>Weight: 0.5 kg</p>
+                <p>Quality: Excellent</p>
+              </div>
+            )}
+
             {activeTab === 'reviews' && (
-
-              <div className="space-y-6">
-
-                {/* REVIEW FORM */}
+              <div
+                role="tabpanel"
+                id="panel-reviews"
+                aria-labelledby="tab-reviews"
+                className="space-y-6"
+              >
                 <div className="bg-slate-100 dark:bg-gray-800/50 p-6 rounded-xl border border-slate-200 dark:border-gray-700/60">
-
                   <h3 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white">
                     Write a Review
                   </h3>
 
-                  {/* stars */}
-                  <div className="flex gap-2 mb-4">
-
+                  <div
+                    className="flex gap-2 mb-4"
+                    role="radiogroup"
+                    aria-label="Review rating"
+                  >
                     {[1, 2, 3, 4, 5].map((star) => (
-
-                      <FaStar
+                      <button
                         key={star}
-                        onClick={() =>
-                          setReviewRating(star)
-                        }
-                        className={`cursor-pointer text-2xl ${
-                          star <= reviewRating
-                            ? 'text-yellow-400'
-                            : 'text-gray-400'
-                        }`}
-                      />
-
+                        type="button"
+                        role="radio"
+                        aria-checked={star === reviewRating}
+                        aria-label={`${star} star${star === 1 ? '' : 's'}`}
+                        onClick={() => setReviewRating(star)}
+                        className="p-0 bg-transparent border-0"
+                      >
+                        <FaStar
+                          className={`text-2xl ${
+                            star <= reviewRating
+                              ? 'text-yellow-400'
+                              : 'text-gray-400'
+                          }`}
+                          aria-hidden="true"
+                        />
+                      </button>
                     ))}
-
                   </div>
 
-                  {/* textarea */}
+                  <label htmlFor="review-comment" className="sr-only">
+                    Review comment
+                  </label>
                   <textarea
+                    id="review-comment"
                     value={reviewComment}
-                    onChange={(e) =>
-                      setReviewComment(e.target.value)
-                    }
+                    onChange={(e) => setReviewComment(e.target.value)}
                     placeholder="Write your review..."
                     rows="4"
                     className="w-full p-4 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-slate-900 dark:text-white outline-none"
                   />
 
                   <button
+                    type="button"
                     onClick={handleSubmitReview}
                     className="mt-4 bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg"
                   >
                     Submit Review
                   </button>
-
                 </div>
 
-                {/* REVIEWS LIST */}
                 {reviews.length > 0 ? (
-
                   reviews.map((review, index) => (
-
                     <div
                       key={index}
                       className="bg-slate-100 dark:bg-gray-800/50 p-6 rounded-xl border border-slate-200 dark:border-gray-700/60"
                     >
-
                       <div className="flex items-center gap-4 mb-4">
-
-                        <div className="flex gap-1">
-
+                        <div className="flex gap-1" aria-hidden="true">
                           {[...Array(review.rating)].map((_, i) => (
-
-                            <FaStar
-                              key={i}
-                              className="text-yellow-400"
-                            />
-
+                            <FaStar key={i} className="text-yellow-400" />
                           ))}
-
                         </div>
-
                         <span className="text-cyan-400 font-semibold">
                           {review.name}
                         </span>
-
                       </div>
-
                       <p className="text-slate-700 dark:text-gray-300">
                         {review.comment}
                       </p>
-
                       <p className="text-slate-500 dark:text-gray-400 text-sm mt-3">
-                        {new Date(
-                          review.createdAt
-                        ).toLocaleDateString()}
+                        {new Date(review.createdAt).toLocaleDateString()}
                       </p>
-
                     </div>
-
                   ))
-
                 ) : (
-
-                  <p className="text-gray-500">
+                  <p className="text-gray-500" role="status">
                     No reviews yet.
                   </p>
-
                 )}
-
               </div>
-
             )}
-
           </div>
-
         </div>
-
       </div>
 
-      {/* RELATED PRODUCTS */}
-      <div className="py-16">
-
+      <section className="py-16" aria-labelledby="related-products-heading">
         <div className="max-w-7xl mx-auto px-4">
-
-          <h2 className="text-2xl font-semibold mb-6 text-white">
+          <h2 id="related-products-heading" className="text-2xl font-semibold mb-6 text-white">
             Similar Items
           </h2>
-
           <RelatedProduct
             category={productData.category}
             subCategory={productData.subCategory}
@@ -658,12 +607,9 @@ function ProductDetail() {
             tags={productData.tags || []}
             price={productData.price || 0}
           />
-
         </div>
-
-      </div>
-
-    </div>
+      </section>
+    </main>
   );
 }
 
