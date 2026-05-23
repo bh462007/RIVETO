@@ -1,24 +1,24 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { IoEyeOutline, IoEye, IoMail, IoLockClosed } from "react-icons/io5";
-import { FcGoogle } from "react-icons/fc";
-import axios from "axios";
-import { signInWithPopup } from "firebase/auth";
-import { auth, provider } from "../../utils/Firebase";
-import { authDataContext } from "../context/AuthContext";
-import { userDataContext } from "../context/UserContext";
-import { shopDataContext } from "../context/ShopContext";
-import { toast } from "react-toastify";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React, { useState, useContext, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { IoEyeOutline, IoEye, IoMail, IoLockClosed } from 'react-icons/io5';
+import { FcGoogle } from 'react-icons/fc';
+import axios from 'axios';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, provider } from '../../utils/Firebase';
+import { authDataContext } from '../context/AuthContext';
+import { userDataContext } from '../context/UserContext';
+import { shopDataContext } from '../context/ShopContext';
+import { toast } from 'react-toastify';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
 function Login() {
   const [show, setShow] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
-    password: ""
+    email: '',
+    password: '',
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -61,7 +61,7 @@ function Login() {
       gsap.to(leftPanelRef.current.querySelector('.parallax-image'), {
         y: mousePosition.y * 6,
         duration: 0.5,
-        ease: 'power2.out'
+        ease: 'power2.out',
       });
     }
   }, [mousePosition]);
@@ -70,9 +70,10 @@ function Login() {
     const timer = setTimeout(() => {
       setPreload(false);
       // Animations after preload
-      gsap.fromTo(".login-container",
+      gsap.fromTo(
+        '.login-container',
         { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
+        { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
       );
 
       // Staged CTA entry animations - with fallback visibility
@@ -83,7 +84,7 @@ function Login() {
           y: 0,
           duration: 0.8,
           delay: 0.2,
-          ease: "back.out(1.2)"
+          ease: 'back.out(1.2)',
         });
       }
 
@@ -93,13 +94,14 @@ function Login() {
           opacity: 1,
           duration: 0.6,
           delay: 0.4,
-          ease: "power2.out"
+          ease: 'power2.out',
         });
       }
 
-      gsap.fromTo(".form-element",
+      gsap.fromTo(
+        '.form-element',
         { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "back.out(1.7)" }
+        { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'back.out(1.7)' }
       );
     }, 1000);
 
@@ -123,13 +125,13 @@ function Login() {
     const newErrors = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
+      newErrors.email = 'Please enter a valid email';
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
     }
 
     setErrors(newErrors);
@@ -138,15 +140,15 @@ function Login() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ""
+        [name]: '',
       }));
     }
   };
@@ -160,81 +162,102 @@ function Login() {
 
     setLoading(true);
     try {
-      await axios.post(
-        `${serverUrl}/api/auth/login`,
-        formData,
-        { withCredentials: true }
-      );
+      await axios.post(`${serverUrl}/api/auth/login`, formData, {
+        withCredentials: true,
+      });
 
-      toast.success("🎉 Login successful! Welcome back to Riveto");
+      toast.success('🎉 Login successful! Welcome back to Riveto');
       setTimeout(() => {
         getCurrentUser();
-        navigate("/");
+        navigate('/');
       }, 500);
     } catch (err) {
-      const errorMessage = err?.response?.data?.message || "Login failed. Please check your credentials.";
+      const errorMessage =
+        err?.response?.data?.message ||
+        'Login failed. Please check your credentials.';
       toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-const googleLogin = async () => {
-  setGoogleLoading(true);
-  try {
-    const response = await signInWithPopup(auth, provider);
-    const user = response.user;
+  const googleLogin = async () => {
+    setGoogleLoading(true);
+    try {
+      const response = await signInWithPopup(auth, provider);
+      const user = response.user;
+      console.log('Debug: serverUrl for googleLogin =', serverUrl);
+      // expose the exact request URL for debugging in the browser
+      try {
+        window.__lastGoogleServerUrl = serverUrl;
+        window.__lastGoogleRequest = `${serverUrl}/api/auth/googlelogin`;
+        console.log(
+          'Debug: googleLogin request URL =',
+          window.__lastGoogleRequest
+        );
+      } catch (e) {
+        /* ignore in non-browser environments */
+      }
+      await axios.post(
+        `${serverUrl}/api/auth/googlelogin`,
+        {
+          name: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+        },
+        { withCredentials: true }
+      );
 
-    await axios.post(
-      `${serverUrl}/api/auth/googlelogin`,
-      {
-        name: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL
-      },
-      { withCredentials: true }
-    );
+      toast.success('🎉 Google login successful!');
+      setTimeout(() => {
+        getCurrentUser();
+        navigate('/');
+      }, 500);
+    } catch (err) {
+      // Firebase specific error codes
+      const code = err?.code;
 
-    toast.success("🎉 Google login successful!");
-    setTimeout(() => {
-      getCurrentUser();
-      navigate("/");
-    }, 500);
-  } catch (err) {
-    // Firebase specific error codes
-    const code = err?.code;
+      if (
+        code === 'auth/popup-closed-by-user' ||
+        code === 'auth/cancelled-popup-request'
+      ) {
+        toast.info("Login cancelled. Try again when you're ready.");
+      } else if (code === 'auth/popup-blocked') {
+        toast.warning(
+          '⚠️ Popup was blocked by your browser. Please allow popups for this site and try again.'
+        );
+      } else if (code === 'auth/network-request-failed') {
+        toast.error('🌐 Network error. Please check your internet connection.');
+      } else if (code === 'auth/user-disabled') {
+        toast.error(
+          '🚫 This account has been disabled. Please contact support.'
+        );
+      } else if (err?.response?.status === 500) {
+        toast.error(
+          '🔧 Server error during Google login. Please try again later.'
+        );
+      } else if (err?.response?.data?.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error(
+          'Google login failed. Please try again or use email instead.'
+        );
+      }
 
-    if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
-      toast.info("Login cancelled. Try again when you're ready.");
-    } else if (code === "auth/popup-blocked") {
-      toast.warning("⚠️ Popup was blocked by your browser. Please allow popups for this site and try again.");
-    } else if (code === "auth/network-request-failed") {
-      toast.error("🌐 Network error. Please check your internet connection.");
-    } else if (code === "auth/user-disabled") {
-      toast.error("🚫 This account has been disabled. Please contact support.");
-    } else if (err?.response?.status === 500) {
-      toast.error("🔧 Server error during Google login. Please try again later.");
-    } else if (err?.response?.data?.message) {
-      toast.error(err.response.data.message);
-    } else {
-      toast.error("Google login failed. Please try again or use email instead.");
+      console.error('Google login error:', err);
+    } finally {
+      setGoogleLoading(false);
     }
-
-    console.error("Google login error:", err);
-  } finally {
-    setGoogleLoading(false);
-  }
-};
+  };
   if (preload) {
     return (
       <div className="fixed inset-0 z-50 overflow-hidden bg-[#0B0F1A] flex items-center justify-center">
-
         <div
           className="absolute top-1/2 left-1/2 w-[500px] h-[500px] rounded-full -translate-x-1/2 -translate-y-1/2"
           style={{
             background:
-              "radial-gradient(circle, rgba(37,99,235,0.35), transparent 70%)",
-            filter: "blur(100px)",
+              'radial-gradient(circle, rgba(37,99,235,0.35), transparent 70%)',
+            filter: 'blur(100px)',
           }}
         />
 
@@ -245,17 +268,19 @@ const googleLogin = async () => {
             linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)
           `,
-            backgroundSize: "50px 50px",
+            backgroundSize: '50px 50px',
           }}
         />
         <div className="relative z-10 flex flex-col items-center">
-
           <h1 className="text-5xl font-extrabold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-300 animate-pulse">
             Riveto
           </h1>
 
           <div className="relative w-16 h-16 mb-6">
-            <div aria-hidden="true" className="absolute inset-0 rounded-full border-4 border-cyan-500/20"></div>
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full border-4 border-cyan-500/20"
+            ></div>
 
             <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-cyan-400 border-r-blue-500 animate-spin"></div>
           </div>
@@ -279,7 +304,10 @@ const googleLogin = async () => {
   return (
     <div className="min-h-screen flex bg-white dark:bg-[#0B0F1A] transition-colors duration-300">
       {/* LEFT PANEL - Atmospheric Identity Panel */}
-      <div ref={leftPanelRef} className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+      <div
+        ref={leftPanelRef}
+        className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
+      >
         {/* Atmospheric Product Silhouette */}
         {featuredProduct && (
           <div className="absolute inset-0">
@@ -289,7 +317,7 @@ const googleLogin = async () => {
               className="parallax-image w-full h-full object-cover transition-transform duration-500 ease-out"
               style={{
                 filter: 'grayscale(70%) blur(12px)',
-                opacity: 0.3
+                opacity: 0.3,
               }}
             />
           </div>
@@ -307,8 +335,9 @@ const googleLogin = async () => {
         <div
           className="absolute w-[420px] h-[420px] top-[20%] left-[10%] pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(79,140,255,0.45), transparent 70%)',
-            filter: 'blur(120px)'
+            background:
+              'radial-gradient(circle, rgba(79,140,255,0.45), transparent 70%)',
+            filter: 'blur(120px)',
           }}
         />
 
@@ -316,7 +345,7 @@ const googleLogin = async () => {
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 text-white">
           {/* Logo */}
           <div
-            onClick={() => navigate("/")}
+            onClick={() => navigate('/')}
             className="cursor-pointer mb-16"
             aria-label="Navigate Home"
           >
@@ -329,12 +358,16 @@ const googleLogin = async () => {
           <div className="space-y-6">
             <div>
               <h2 className="text-5xl xl:text-6xl font-bold mb-6 leading-[1.1]">
-                Your Style<br />
+                Your Style
+                <br />
                 Is Waiting.
               </h2>
               <p className="text-lg xl:text-xl text-gray-300 leading-relaxed max-w-md">
-                Your favourites and saved picks are still in stock.<br />
-                <span className="text-white/90 font-medium">Pick up where you left off.</span>
+                Your favourites and saved picks are still in stock.
+                <br />
+                <span className="text-white/90 font-medium">
+                  Pick up where you left off.
+                </span>
               </p>
             </div>
           </div>
@@ -346,7 +379,7 @@ const googleLogin = async () => {
         <div className="login-container max-w-md w-full">
           {/* Mobile Logo */}
           <div
-            onClick={() => navigate("/")}
+            onClick={() => navigate('/')}
             className="cursor-pointer mb-8 text-center lg:hidden"
             aria-label="Navigate Home"
           >
@@ -357,7 +390,9 @@ const googleLogin = async () => {
 
           {/* Header */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back!</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Welcome Back!
+            </h2>
             <p className="text-gray-600 dark:text-gray-400">
               Log in to resume checkout and track your orders.
             </p>
@@ -394,7 +429,9 @@ const googleLogin = async () => {
                   {/* Divider */}
                   <div className="flex items-center">
                     <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-                    <span className="mx-4 text-gray-500 dark:text-gray-400 text-sm">OR</span>
+                    <span className="mx-4 text-gray-500 dark:text-gray-400 text-sm">
+                      OR
+                    </span>
                     <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
                   </div>
 
@@ -402,7 +439,9 @@ const googleLogin = async () => {
                   <form onSubmit={handleLogin} className="space-y-5">
                     {/* Email Field */}
                     <div className="form-element">
-                      <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">Email Address</label>
+                      <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
+                        Email Address
+                      </label>
                       <div className="relative">
                         <IoMail className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
                         <input
@@ -414,16 +453,22 @@ const googleLogin = async () => {
                           onChange={handleInputChange}
                         />
                       </div>
-                      {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                      {errors.email && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.email}
+                        </p>
+                      )}
                     </div>
 
                     {/* Password Field */}
                     <div className="form-element">
-                      <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">Password</label>
+                      <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
+                        Password
+                      </label>
                       <div className="relative">
                         <IoLockClosed className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
                         <input
-                          type={show ? "text" : "password"}
+                          type={show ? 'text' : 'password'}
                           name="password"
                           placeholder="Enter your password"
                           className="w-full pl-10 pr-12 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all"
@@ -434,19 +479,27 @@ const googleLogin = async () => {
                           type="button"
                           onClick={() => setShow(!show)}
                           className="absolute right-3 top-3 text-gray-400 hover:text-[#2563EB] transition-colors"
-                          aria-label={show ? "Hide password" : "Show password"}
+                          aria-label={show ? 'Hide password' : 'Show password'}
                         >
-                          {show ? <IoEye className="w-5 h-5" /> : <IoEyeOutline className="w-5 h-5" />}
+                          {show ? (
+                            <IoEye className="w-5 h-5" />
+                          ) : (
+                            <IoEyeOutline className="w-5 h-5" />
+                          )}
                         </button>
                       </div>
-                      {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                      {errors.password && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.password}
+                        </p>
+                      )}
                     </div>
 
                     {/* Forgot Password */}
                     <div className="form-element text-right">
                       <button
                         type="button"
-                        onClick={() => navigate("/forgot-password")}
+                        onClick={() => navigate('/forgot-password')}
                         className="text-[#2563EB] hover:text-[#1d4ed8] text-sm transition-colors font-medium"
                       >
                         Forgot your password?
@@ -465,7 +518,7 @@ const googleLogin = async () => {
                           Accessing...
                         </>
                       ) : (
-                        "Continue Shopping"
+                        'Continue Shopping'
                       )}
                     </button>
                   </form>
@@ -476,9 +529,9 @@ const googleLogin = async () => {
             {/* Sign Up Link */}
             <div className="form-element text-center pt-6 border-t border-gray-200 dark:border-gray-700">
               <p className="text-gray-600 dark:text-gray-400">
-                Don't have an account?{" "}
+                Don't have an account?{' '}
                 <button
-                  onClick={() => navigate("/signup")}
+                  onClick={() => navigate('/signup')}
                   className="text-[#2563EB] hover:text-[#1d4ed8] font-semibold transition-colors"
                 >
                   Create Account

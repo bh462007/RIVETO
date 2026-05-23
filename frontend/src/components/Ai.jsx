@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import robot from "../assets/airobot.gif";
+import robot from '../assets/airobot.gif';
 import { shopDataContext } from '../context/ShopContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import sound from "../assets/swift-sound.mp3";
+import sound from '../assets/swift-sound.mp3';
 import { X, Mic, MicOff, MessageCircle } from 'lucide-react';
 
 function Ai() {
@@ -21,7 +21,8 @@ function Ai() {
   // Auto-scroll to bottom of chat
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   }, [chatMessages]);
 
@@ -32,14 +33,18 @@ function Ai() {
     window.speechSynthesis.speak(utterance);
 
     // Add AI message to chat
-    setChatMessages(prev => [...prev, { text: message, sender: 'ai', timestamp: new Date() }]);
+    setChatMessages((prev) => [
+      ...prev,
+      { text: message, sender: 'ai', timestamp: new Date() },
+    ]);
   };
 
-  const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const speechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = speechRecognition ? new speechRecognition() : null;
 
   if (!recognition) {
-    console.log("❌ Speech recognition not supported in this browser.");
+    console.log('❌ Speech recognition not supported in this browser.');
   } else {
     recognition.continuous = false;
     recognition.interimResults = false;
@@ -47,7 +52,7 @@ function Ai() {
 
   const handleVoiceCommand = () => {
     if (!recognition) {
-      toast.error("Speech recognition is not supported in your browser.");
+      toast.error('Speech recognition is not supported in your browser.');
       return;
     }
 
@@ -61,41 +66,65 @@ function Ai() {
       const transcript = e.results[0][0].transcript.trim().toLowerCase();
 
       // Add user message to chat
-      setChatMessages(prev => [...prev, { text: transcript, sender: 'user', timestamp: new Date() }]);
+      setChatMessages((prev) => [
+        ...prev,
+        { text: transcript, sender: 'user', timestamp: new Date() },
+      ]);
 
-      if (transcript.includes("search") && transcript.includes("open") && !showSearch) {
-        speak("Opening search for you");
+      if (
+        transcript.includes('search') &&
+        transcript.includes('open') &&
+        !showSearch
+      ) {
+        speak('Opening search for you');
         setShowSearch(true);
-        navigate("/collection");
-      } else if (transcript.includes("search") && transcript.includes("close") && showSearch) {
-        speak("Closing search");
+        navigate('/collection');
+      } else if (
+        transcript.includes('search') &&
+        transcript.includes('close') &&
+        showSearch
+      ) {
+        speak('Closing search');
         setShowSearch(false);
-      } else if (transcript.includes("collection") || transcript.includes("products")) {
-        speak("Taking you to our collection page");
-        navigate("/collection");
-      } else if (transcript.includes("about")) {
+      } else if (
+        transcript.includes('collection') ||
+        transcript.includes('products')
+      ) {
+        speak('Taking you to our collection page');
+        navigate('/collection');
+      } else if (transcript.includes('about')) {
         speak("Here's our about page");
-        navigate("/about");
+        navigate('/about');
         setShowSearch(false);
-      } else if (transcript.includes("home") || transcript.includes("main")) {
-        speak("Going to the home page");
-        navigate("/");
+      } else if (transcript.includes('home') || transcript.includes('main')) {
+        speak('Going to the home page');
+        navigate('/');
         setShowSearch(false);
-      } else if (transcript.includes("cart") || transcript.includes("basket")) {
-        speak("Opening your shopping cart");
-        navigate("/cart");
+      } else if (transcript.includes('cart') || transcript.includes('basket')) {
+        speak('Opening your shopping cart');
+        navigate('/cart');
         setShowSearch(false);
-      } else if (transcript.includes("contact") || transcript.includes("help")) {
-        speak("Taking you to our contact page");
-        navigate("/contact");
+      } else if (
+        transcript.includes('contact') ||
+        transcript.includes('help')
+      ) {
+        speak('Taking you to our contact page');
+        navigate('/contact');
         setShowSearch(false);
-      } else if (transcript.includes("order") || transcript.includes("my orders")) {
-        speak("Showing your orders");
-        navigate("/order");
+      } else if (
+        transcript.includes('order') ||
+        transcript.includes('my orders')
+      ) {
+        speak('Showing your orders');
+        navigate('/order');
         setShowSearch(false);
       } else {
-        speak("I'm not sure how to help with that. Try asking about navigation, products, or your orders.");
-        toast.info("Try saying: 'go to collection', 'open cart', or 'view orders'");
+        speak(
+          "I'm not sure how to help with that. Try asking about navigation, products, or your orders."
+        );
+        toast.info(
+          "Try saying: 'go to collection', 'open cart', or 'view orders'"
+        );
       }
     };
 
@@ -115,10 +144,10 @@ function Ai() {
   };
 
   const handleRobotClick = () => {
-    setShowChat(prev => !prev);
+    setShowChat((prev) => !prev);
 
     if (!hasWelcomed && !showChat) {
-      speak("Welcome to RIVETO! How can I assist you today?");
+      speak('Welcome to RIVETO! How can I assist you today?');
       setHasWelcomed(true);
     }
   };
@@ -128,19 +157,16 @@ function Ai() {
   };
 
   const commonCommands = [
-    { command: "Go to collection", description: "Browse products" },
-    { command: "Open cart", description: "View your cart" },
-    { command: "View orders", description: "Check your orders" },
-    { command: "About us", description: "Learn about RIVETO" },
+    { command: 'Go to collection', description: 'Browse products' },
+    { command: 'Open cart', description: 'View your cart' },
+    { command: 'View orders', description: 'Check your orders' },
+    { command: 'About us', description: 'Learn about RIVETO' },
   ];
 
   return (
     <div className="fixed bottom-28 md:bottom-6 right-5 z-40">
       {/* AI Assistant Robot */}
-      <div
-        className="relative cursor-pointer group"
-        onClick={handleRobotClick}
-      >
+      <div className="relative cursor-pointer group" onClick={handleRobotClick}>
         <div className="absolute -top-2 -right-2 bg-[#EF4444] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs animate-pulse">
           <MessageCircle size={17} />
         </div>
@@ -148,9 +174,16 @@ function Ai() {
           src={robot}
           alt="AI Assistant Robot"
           className="w-20 h-20 transition-all duration-300"
-          style={{ filter: activeAi ? "drop-shadow(0 4px 6px rgba(37, 99, 235, 0.4))" : "drop-shadow(0 4px 8px rgba(0,0,0,0.2))" }}
+          style={{
+            filter: activeAi
+              ? 'drop-shadow(0 4px 6px rgba(37, 99, 235, 0.4))'
+              : 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
+          }}
         />
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{ fontFamily: 'Inter, sans-serif' }}
+        >
           AI Assistant
         </div>
       </div>
@@ -162,7 +195,12 @@ function Ai() {
           <div className="bg-[#2563EB] text-white py-2 px-4 flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-              <h3 className="font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>RIVETO AI Assistant</h3>
+              <h3
+                className="font-semibold"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                RIVETO AI Assistant
+              </h3>
             </div>
             <button
               onClick={closeChat}
@@ -189,14 +227,20 @@ function Ai() {
                   className={`mb-3 flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-xs p-2 rounded-2xl ${msg.sender === 'user'
-                      ? 'bg-blue-500 text-white rounded-br-none'
-                      : 'bg-gray-200 text-gray-800 rounded-bl-none'
-                      }`}
+                    className={`max-w-xs p-2 rounded-2xl ${
+                      msg.sender === 'user'
+                        ? 'bg-blue-500 text-white rounded-br-none'
+                        : 'bg-gray-200 text-gray-800 rounded-bl-none'
+                    }`}
                   >
                     {msg.text}
-                    <div className={`text-xs mt-1 ${msg.sender === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
-                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div
+                      className={`text-xs mt-1 ${msg.sender === 'user' ? 'text-blue-100' : 'text-gray-500'}`}
+                    >
+                      {msg.timestamp.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </div>
                   </div>
                 </div>
@@ -217,21 +261,16 @@ function Ai() {
                 transition-all duration-300
                 focus:outline-none
                 focus:ring-2 focus:ring-[#2563EB]/30
-                ${isListening
-                  ? "bg-[#EF4444] hover:bg-red-600"
-                  : "bg-[#2563EB] hover:bg-[#1d4ed8]"
+                ${
+                  isListening
+                    ? 'bg-[#EF4444] hover:bg-red-600'
+                    : 'bg-[#2563EB] hover:bg-[#1d4ed8]'
                 }
              `}
             >
-              {isListening ? (
-                <MicOff size={22} />
-              ) : (
-                <Mic size={22} />
-              )}
+              {isListening ? <MicOff size={22} /> : <Mic size={22} />}
             </button>
-
           </div>
-
 
           {/* Quick Commands */}
           <div className="px-3 py-1 border-t border-gray-200 bg-white">
@@ -243,13 +282,13 @@ function Ai() {
                   className="bg-gray-100 hover:bg-gray-200 transition-colors p-2 rounded text-xs cursor-pointer"
                   onClick={() => speak(cmd.description)}
                 >
-                  <div className="font-medium truncate text-black">"{cmd.command}"</div>
+                  <div className="font-medium truncate text-black">
+                    "{cmd.command}"
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-
-
         </div>
       )}
     </div>

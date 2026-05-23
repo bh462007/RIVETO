@@ -28,8 +28,7 @@ export const addReview = async (req, res) => {
     const reviews = await Review.find({ productId });
 
     const avgRating =
-      reviews.reduce((acc, item) => acc + item.rating, 0) /
-      reviews.length;
+      reviews.reduce((acc, item) => acc + item.rating, 0) / reviews.length;
 
     await Product.findByIdAndUpdate(productId, {
       rating: parseFloat(avgRating.toFixed(1)),

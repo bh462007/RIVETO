@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect, useState } from "react";
+import { useRef, useLayoutEffect, useState } from 'react';
 import {
   motion,
   useScroll,
@@ -7,8 +7,8 @@ import {
   useMotionValue,
   useVelocity,
   useAnimationFrame,
-} from "motion/react";
-import "./ScrollVelocity.css";
+} from 'motion/react';
+import './ScrollVelocity.css';
 
 function useElementWidth(ref) {
   const [width, setWidth] = useState(0);
@@ -20,8 +20,8 @@ function useElementWidth(ref) {
       }
     }
     updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
   }, [ref]);
 
   return width;
@@ -31,13 +31,13 @@ export const ScrollVelocity = ({
   scrollContainerRef,
   texts = [],
   velocity = 100,
-  className = "",
+  className = '',
   damping = 50,
   stiffness = 400,
   numCopies = 6,
   velocityMapping = { input: [0, 1000], output: [0, 5] },
-  parallaxClassName = "parallax",
-  scrollerClassName = "scroller",
+  parallaxClassName = 'parallax',
+  scrollerClassName = 'scroller',
   parallaxStyle,
   scrollerStyle,
 }) => {
@@ -45,7 +45,7 @@ export const ScrollVelocity = ({
     children,
     baseVelocity = velocity,
     scrollContainerRef,
-    className = "",
+    className = '',
     damping,
     stiffness,
     numCopies,
@@ -56,7 +56,9 @@ export const ScrollVelocity = ({
     scrollerStyle,
   }) {
     const baseX = useMotionValue(0);
-    const scrollOptions = scrollContainerRef ? { container: scrollContainerRef } : {};
+    const scrollOptions = scrollContainerRef
+      ? { container: scrollContainerRef }
+      : {};
     const { scrollY } = useScroll(scrollOptions);
     const scrollVelocity = useVelocity(scrollY);
     const smoothVelocity = useSpring(scrollVelocity, {
@@ -80,7 +82,7 @@ export const ScrollVelocity = ({
     }
 
     const x = useTransform(baseX, (v) => {
-      if (copyWidth === 0) return "0px";
+      if (copyWidth === 0) return '0px';
       return `${wrap(-copyWidth, 0, v)}px`;
     });
 

@@ -5,17 +5,17 @@ import { shopDataContext } from '../context/ShopContext';
 import { authDataContext } from '../context/AuthContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { 
-  FaMoneyBillWave, 
-  FaMapMarkerAlt, 
-  FaUser, 
-  FaEnvelope, 
-  FaPhone, 
-  FaCity, 
+import {
+  FaMoneyBillWave,
+  FaMapMarkerAlt,
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaCity,
   FaGlobe,
   FaLock,
   FaShippingFast,
-  FaCheckCircle
+  FaCheckCircle,
 } from 'react-icons/fa';
 import { RiSecurePaymentLine, RiCoupon2Line } from 'react-icons/ri';
 import gsap from 'gsap';
@@ -28,8 +28,14 @@ function PlaceOrder() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const navigate = useNavigate();
-  
-  const { cartItem, setCartItem, getCartAmount, delivery_fee, product: products } = useContext(shopDataContext);
+
+  const {
+    cartItem,
+    setCartItem,
+    getCartAmount,
+    delivery_fee,
+    product: products,
+  } = useContext(shopDataContext);
   const { serverUrl, userData } = useContext(authDataContext);
 
   const [formData, setFormData] = useState({
@@ -41,24 +47,27 @@ function PlaceOrder() {
     state: '',
     pincode: '',
     country: 'India',
-    phone: userData?.phone || ''
+    phone: userData?.phone || '',
   });
 
   useEffect(() => {
     // Animations
-    gsap.fromTo('.form-section',
+    gsap.fromTo(
+      '.form-section',
       { opacity: 0, x: -50 },
-      { opacity: 1, x: 0, duration: 1, ease: "power3.out" }
+      { opacity: 1, x: 0, duration: 1, ease: 'power3.out' }
     );
 
-    gsap.fromTo('.payment-section',
+    gsap.fromTo(
+      '.payment-section',
       { opacity: 0, x: 50 },
-      { opacity: 1, x: 0, duration: 1, ease: "power3.out", delay: 0.3 }
+      { opacity: 1, x: 0, duration: 1, ease: 'power3.out', delay: 0.3 }
     );
 
-    gsap.fromTo('.payment-method',
+    gsap.fromTo(
+      '.payment-method',
       { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "back.out(1.7)" }
+      { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: 'back.out(1.7)' }
     );
   }, []);
 
@@ -76,7 +85,8 @@ function PlaceOrder() {
     if (!formData.city) errors.city = 'City is required';
     if (!formData.state) errors.state = 'State is required';
     if (!formData.pincode) errors.pincode = 'Pincode is required';
-    if (!pincodeRegex.test(formData.pincode)) errors.pincode = 'Invalid pincode';
+    if (!pincodeRegex.test(formData.pincode))
+      errors.pincode = 'Invalid pincode';
     if (!formData.country) errors.country = 'Country is required';
     if (!formData.phone) errors.phone = 'Phone number is required';
     if (!phoneRegex.test(formData.phone)) errors.phone = 'Invalid phone number';
@@ -87,16 +97,16 @@ function PlaceOrder() {
 
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
-    setFormData(data => ({ ...data, [name]: value }));
+    setFormData((data) => ({ ...data, [name]: value }));
     // Clear error when user starts typing
     if (formErrors[name]) {
-      setFormErrors(prev => ({ ...prev, [name]: '' }));
+      setFormErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -109,7 +119,9 @@ function PlaceOrder() {
       for (const productId in cartItem) {
         for (const size in cartItem[productId]) {
           if (cartItem[productId][size] > 0) {
-            const itemInfo = structuredClone(products.find(product => product._id === productId));
+            const itemInfo = structuredClone(
+              products.find((product) => product._id === productId)
+            );
             if (itemInfo) {
               itemInfo.size = size;
               itemInfo.quantity = cartItem[productId][size];
@@ -124,15 +136,18 @@ function PlaceOrder() {
         items: orderItems,
         amount: getCartAmount() + delivery_fee,
         paymentMethod: method,
-        status: 'Placed'
+        status: 'Placed',
       };
 
-      const result = await axios.post(`${serverUrl}/api/order/placeorder`, orderData, { withCredentials: true });
+      const result = await axios.post(
+        `${serverUrl}/api/order/placeorder`,
+        orderData,
+        { withCredentials: true }
+      );
       if (result.data) {
         setCartItem({});
-        navigate("/order");
+        navigate('/order');
       }
-
     } catch (error) {
       console.error('Error placing order:', error);
       setIsProcessing(false);
@@ -145,12 +160,12 @@ function PlaceOrder() {
       name: 'Cash on Delivery',
       icon: FaMoneyBillWave,
       description: 'Pay when you receive your order',
-      color: 'from-green-500 to-emerald-500'
-    }
+      color: 'from-green-500 to-emerald-500',
+    },
   ];
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-900 via-[#0f172a] to-[#0c4a6e] pt-24 pb-20 px-4'>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-[#0f172a] to-[#0c4a6e] pt-24 pb-20 px-4">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden z-0">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl"></div>
@@ -161,7 +176,9 @@ function PlaceOrder() {
         {/* Header */}
         <div className="text-center mb-12">
           <Title text1={'COMPLETE'} text2={'YOUR ORDER'} />
-          <p className="text-cyan-100 mt-4">Almost there! Review your details and complete your purchase</p>
+          <p className="text-cyan-100 mt-4">
+            Almost there! Review your details and complete your purchase
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -170,13 +187,17 @@ function PlaceOrder() {
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700 p-8">
               <div className="flex items-center gap-3 mb-6">
                 <FaMapMarkerAlt className="w-6 h-6 text-cyan-400" />
-                <h2 className="text-2xl font-bold text-white">Delivery Information</h2>
+                <h2 className="text-2xl font-bold text-white">
+                  Delivery Information
+                </h2>
               </div>
 
               <form onSubmit={onSubmitHandler} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-gray-300 text-sm mb-2">First Name</label>
+                    <label className="block text-gray-300 text-sm mb-2">
+                      First Name
+                    </label>
                     <div className="relative">
                       <FaUser className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
                       <input
@@ -189,11 +210,17 @@ function PlaceOrder() {
                         required
                       />
                     </div>
-                    {formErrors.firstname && <p className="text-red-400 text-sm mt-1">{formErrors.firstname}</p>}
+                    {formErrors.firstname && (
+                      <p className="text-red-400 text-sm mt-1">
+                        {formErrors.firstname}
+                      </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-gray-300 text-sm mb-2">Last Name</label>
+                    <label className="block text-gray-300 text-sm mb-2">
+                      Last Name
+                    </label>
                     <div className="relative">
                       <FaUser className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
                       <input
@@ -206,12 +233,18 @@ function PlaceOrder() {
                         required
                       />
                     </div>
-                    {formErrors.lastname && <p className="text-red-400 text-sm mt-1">{formErrors.lastname}</p>}
+                    {formErrors.lastname && (
+                      <p className="text-red-400 text-sm mt-1">
+                        {formErrors.lastname}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 text-sm mb-2">Email Address</label>
+                  <label className="block text-gray-300 text-sm mb-2">
+                    Email Address
+                  </label>
                   <div className="relative">
                     <FaEnvelope className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
                     <input
@@ -224,11 +257,17 @@ function PlaceOrder() {
                       required
                     />
                   </div>
-                  {formErrors.email && <p className="text-red-400 text-sm mt-1">{formErrors.email}</p>}
+                  {formErrors.email && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {formErrors.email}
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 text-sm mb-2">Street Address</label>
+                  <label className="block text-gray-300 text-sm mb-2">
+                    Street Address
+                  </label>
                   <div className="relative">
                     <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
                     <input
@@ -241,12 +280,18 @@ function PlaceOrder() {
                       required
                     />
                   </div>
-                  {formErrors.street && <p className="text-red-400 text-sm mt-1">{formErrors.street}</p>}
+                  {formErrors.street && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {formErrors.street}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-gray-300 text-sm mb-2">City</label>
+                    <label className="block text-gray-300 text-sm mb-2">
+                      City
+                    </label>
                     <div className="relative">
                       <FaCity className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
                       <input
@@ -259,11 +304,17 @@ function PlaceOrder() {
                         required
                       />
                     </div>
-                    {formErrors.city && <p className="text-red-400 text-sm mt-1">{formErrors.city}</p>}
+                    {formErrors.city && (
+                      <p className="text-red-400 text-sm mt-1">
+                        {formErrors.city}
+                      </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-gray-300 text-sm mb-2">State</label>
+                    <label className="block text-gray-300 text-sm mb-2">
+                      State
+                    </label>
                     <input
                       type="text"
                       name="state"
@@ -273,13 +324,19 @@ function PlaceOrder() {
                       className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                       required
                     />
-                    {formErrors.state && <p className="text-red-400 text-sm mt-1">{formErrors.state}</p>}
+                    {formErrors.state && (
+                      <p className="text-red-400 text-sm mt-1">
+                        {formErrors.state}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-gray-300 text-sm mb-2">Pincode</label>
+                    <label className="block text-gray-300 text-sm mb-2">
+                      Pincode
+                    </label>
                     <input
                       type="text"
                       name="pincode"
@@ -289,11 +346,17 @@ function PlaceOrder() {
                       className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                       required
                     />
-                    {formErrors.pincode && <p className="text-red-400 text-sm mt-1">{formErrors.pincode}</p>}
+                    {formErrors.pincode && (
+                      <p className="text-red-400 text-sm mt-1">
+                        {formErrors.pincode}
+                      </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-gray-300 text-sm mb-2">Country</label>
+                    <label className="block text-gray-300 text-sm mb-2">
+                      Country
+                    </label>
                     <div className="relative">
                       <FaGlobe className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
                       <input
@@ -306,12 +369,18 @@ function PlaceOrder() {
                         required
                       />
                     </div>
-                    {formErrors.country && <p className="text-red-400 text-sm mt-1">{formErrors.country}</p>}
+                    {formErrors.country && (
+                      <p className="text-red-400 text-sm mt-1">
+                        {formErrors.country}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 text-sm mb-2">Phone Number</label>
+                  <label className="block text-gray-300 text-sm mb-2">
+                    Phone Number
+                  </label>
                   <div className="relative">
                     <FaPhone className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
                     <input
@@ -324,7 +393,11 @@ function PlaceOrder() {
                       required
                     />
                   </div>
-                  {formErrors.phone && <p className="text-red-400 text-sm mt-1">{formErrors.phone}</p>}
+                  {formErrors.phone && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {formErrors.phone}
+                    </p>
+                  )}
                 </div>
               </form>
             </div>
@@ -340,7 +413,9 @@ function PlaceOrder() {
               <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700 p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <RiSecurePaymentLine className="w-6 h-6 text-cyan-400" />
-                  <h2 className="text-2xl font-bold text-white">Payment Method</h2>
+                  <h2 className="text-2xl font-bold text-white">
+                    Payment Method
+                  </h2>
                 </div>
 
                 <div className="space-y-4">
@@ -357,16 +432,26 @@ function PlaceOrder() {
                         onClick={() => setMethod(payment.id)}
                       >
                         <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${payment.color} flex items-center justify-center`}>
+                          <div
+                            className={`w-12 h-12 rounded-lg bg-gradient-to-r ${payment.color} flex items-center justify-center`}
+                          >
                             <IconComponent className="w-6 h-6 text-white" />
                           </div>
                           <div className="flex-1">
-                            <h3 className="text-white font-semibold">{payment.name}</h3>
-                            <p className="text-gray-400 text-sm">{payment.description}</p>
+                            <h3 className="text-white font-semibold">
+                              {payment.name}
+                            </h3>
+                            <p className="text-gray-400 text-sm">
+                              {payment.description}
+                            </p>
                           </div>
-                          <div className={`w-5 h-5 rounded-full border-2 ${
-                            method === payment.id ? 'bg-cyan-500 border-cyan-500' : 'border-gray-500'
-                          }`}></div>
+                          <div
+                            className={`w-5 h-5 rounded-full border-2 ${
+                              method === payment.id
+                                ? 'bg-cyan-500 border-cyan-500'
+                                : 'border-gray-500'
+                            }`}
+                          ></div>
                         </div>
                       </div>
                     );
@@ -377,7 +462,9 @@ function PlaceOrder() {
                 <div className="mt-6 p-4 bg-green-500/10 rounded-xl border border-green-500/20">
                   <div className="flex items-center gap-3">
                     <FaLock className="w-5 h-5 text-green-400" />
-                    <span className="text-green-400 text-sm">256-bit SSL secured payment</span>
+                    <span className="text-green-400 text-sm">
+                      256-bit SSL secured payment
+                    </span>
                   </div>
                 </div>
               </div>

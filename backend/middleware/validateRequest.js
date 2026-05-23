@@ -7,11 +7,11 @@ const validateRequest = (schema) => {
     if (error) {
       // Extract just the message strings from the error details
       const errorMessages = error.details.map((detail) => detail.message);
-      
+
       return res.status(400).json({
         success: false,
         message: "Validation Error",
-        errors: errorMessages
+        errors: errorMessages,
       });
     }
 

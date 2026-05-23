@@ -5,7 +5,7 @@ import { authDataContext } from './AuthContext';
 export const userDataContext = createContext();
 
 function UserContext({ children }) {
-  const [userData, setUserData] = useState(null); 
+  const [userData, setUserData] = useState(null);
   const { serverUrl } = useContext(authDataContext);
 
   const getCurrentUser = async () => {
@@ -14,13 +14,13 @@ function UserContext({ children }) {
         withCredentials: true,
       });
       setUserData(result.data);
-      console.log("✅ Current user:", result.data);
+      console.log('✅ Current user:', result.data);
     } catch (error) {
       setUserData(null);
       if (error.response && error.response.status === 401) {
-        console.log("🚫 Unauthorized: No user logged in");
+        console.log('🚫 Unauthorized: No user logged in');
       } else {
-        console.error("❌ Error fetching current user:", error);
+        console.error('❌ Error fetching current user:', error);
       }
     }
   };

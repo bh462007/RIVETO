@@ -1,4 +1,3 @@
-
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
@@ -11,7 +10,9 @@ import ThemeProvider from './context/ThemeContext.jsx'; // ⬅️ import
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <ThemeProvider> {/* ⬅️ wrap here */}
+    <ThemeProvider>
+      {' '}
+      {/* ⬅️ wrap here */}
       <AuthContext>
         <UserContext>
           <ShopContext>

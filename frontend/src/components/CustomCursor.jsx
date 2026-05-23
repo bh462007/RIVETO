@@ -37,8 +37,8 @@ function CustomCursor() {
     >
       {/* Main shopping bag icon */}
       <div className="relative animate-float">
-        <BsHandbag 
-          className="text-indigo-500 drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]" 
+        <BsHandbag
+          className="text-indigo-500 drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]"
           size={32}
         />
         {/* Glow effect */}

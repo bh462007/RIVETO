@@ -151,7 +151,7 @@ function ProductDetail() {
           rating: reviewRating,
           comment: reviewComment,
         },
-        { withCredentials: true },
+        { withCredentials: true }
       );
 
       toast.success('Review added successfully');
@@ -185,9 +185,7 @@ function ProductDetail() {
     ].filter(Boolean);
 
     setCurrentImageIndex((prev) => (prev - 1 + imgs.length) % imgs.length);
-    setSelectedImage(
-      imgs[(currentImageIndex - 1 + imgs.length) % imgs.length],
-    );
+    setSelectedImage(imgs[(currentImageIndex - 1 + imgs.length) % imgs.length]);
   };
 
   if (!productData) {
@@ -199,7 +197,10 @@ function ProductDetail() {
     if (allPagesLoaded) {
       return (
         <div className="min-h-screen bg-gradient-to-br from-slate-100 to-sky-100 dark:from-[#0f172a] dark:to-[#0c4a6e] flex items-center justify-center">
-          <div className="text-slate-900 dark:text-white text-center" role="status">
+          <div
+            className="text-slate-900 dark:text-white text-center"
+            role="status"
+          >
             <p className="text-lg">Product not found.</p>
           </div>
         </div>
@@ -305,16 +306,25 @@ function ProductDetail() {
                       : 'border-[#1f2a44] opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={img}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
           </section>
 
           <div className="space-y-6 text-slate-900 dark:text-white">
-            <nav className="text-sm text-slate-500 dark:text-gray-400" aria-label="Breadcrumb">
+            <nav
+              className="text-sm text-slate-500 dark:text-gray-400"
+              aria-label="Breadcrumb"
+            >
               Home / {productData.category} / {productData.subCategory} /{' '}
-              <span className="text-cyan-500 dark:text-cyan-400">{productData.name}</span>
+              <span className="text-cyan-500 dark:text-cyan-400">
+                {productData.name}
+              </span>
             </nav>
 
             <div>
@@ -330,7 +340,9 @@ function ProductDetail() {
                     <FaStar
                       key={i}
                       className={
-                        i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-400'
+                        i < Math.floor(rating)
+                          ? 'text-yellow-400'
+                          : 'text-gray-400'
                       }
                     />
                   ))}
@@ -597,7 +609,10 @@ function ProductDetail() {
 
       <section className="py-16" aria-labelledby="related-products-heading">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 id="related-products-heading" className="text-2xl font-semibold mb-6 text-white">
+          <h2
+            id="related-products-heading"
+            className="text-2xl font-semibold mb-6 text-white"
+          >
             Similar Items
           </h2>
           <RelatedProduct

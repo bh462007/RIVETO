@@ -1,27 +1,30 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    cartData: {
+      type: Object,
+      default: {},
+    },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true
+  {
+    timestamps: true,
+    minimize: false, // Prevents empty nested objects from being removed
   },
-  password: {
-    type: String,
-    required: true
-  },
- cartData: {
-  type: Object,
-  default: {}
-}
-}, { 
-  timestamps: true, 
-  minimize: false    // Prevents empty nested objects from being removed
-});
+);
 
 const User = mongoose.model("User", userSchema);
 

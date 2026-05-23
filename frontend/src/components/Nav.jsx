@@ -1,4 +1,10 @@
-import React, { useContext, useState, useRef, useEffect, useCallback } from 'react';
+import React, {
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from 'react';
 import { useFocusTrap, useEscapeKey } from '../hooks/useDialogA11y';
 import { IoSearchCircleOutline, IoSearchCircleSharp } from 'react-icons/io5';
 import { FaUserCircle } from 'react-icons/fa';
@@ -155,16 +161,18 @@ function Nav() {
                   type="button"
                   onClick={() => navigate(path)}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`relative py-2 transition-colors cursor-pointer ${isActive
-                    ? 'text-[#2563EB] font-semibold'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                  className={`relative py-2 transition-colors cursor-pointer ${
+                    isActive
+                      ? 'text-[#2563EB] font-semibold'
+                      : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                  }`}
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   {label}
                   <span
-                    className={`absolute -bottom-1 left-0 h-0.5 bg-[#2563EB] transition-all duration-300 ${isActive ? 'w-full' : 'w-0'
-                      }`}
+                    className={`absolute -bottom-1 left-0 h-0.5 bg-[#2563EB] transition-all duration-300 ${
+                      isActive ? 'w-full' : 'w-0'
+                    }`}
                     aria-hidden="true"
                   ></span>
                 </button>
@@ -201,7 +209,11 @@ function Nav() {
               type="button"
               onClick={toggleTheme}
               className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label={
+                theme === 'dark'
+                  ? 'Switch to light mode'
+                  : 'Switch to dark mode'
+              }
             >
               {theme === 'dark' ? (
                 <BsSun className="text-yellow-400 text-lg" />
@@ -240,9 +252,15 @@ function Nav() {
                   : 'Shopping cart, empty'
               }
             >
-              <MdOutlineShoppingCart className="w-6 h-6 text-gray-700 dark:text-gray-300" aria-hidden="true" />
+              <MdOutlineShoppingCart
+                className="w-6 h-6 text-gray-700 dark:text-gray-300"
+                aria-hidden="true"
+              />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full" aria-hidden="true">
+                <span
+                  className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full"
+                  aria-hidden="true"
+                >
                   {cartCount}
                 </span>
               )}
@@ -262,7 +280,10 @@ function Nav() {
               <label htmlFor="nav-search-input" className="sr-only">
                 Search products
               </label>
-              <BsSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+              <BsSearch
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+              />
               <input
                 id="nav-search-input"
                 type="search"
@@ -290,7 +311,9 @@ function Nav() {
               <div className="px-4 py-4 border-b border-gray-200 dark:border-[#1f2a44] bg-gray-50 dark:bg-[#0f172a]">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-lg">
-                    {userData.name ? userData.name.charAt(0).toUpperCase() : 'U'}
+                    {userData.name
+                      ? userData.name.charAt(0).toUpperCase()
+                      : 'U'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
@@ -398,9 +421,6 @@ function Nav() {
             )}
           </div>
         )}
-
-
-
       </header>
       {/* Mobile Bottom Navigation */}
       <nav
@@ -428,7 +448,6 @@ px-3
         aria-label="Mobile navigation"
       >
         <div className="flex items-center justify-between w-full px-2">
-
           {/* Left Side */}
           <div className="flex items-center gap-2">
             {[
@@ -446,23 +465,22 @@ px-3
                   key={index}
                   type="button"
                   onClick={() => navigate(item.path)}
-                  className={`flex flex-col items-center justify-center pt-1 w-[58px] h-[58px] rounded-2xl transition-all duration-300 ${isActive
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg shadow-blue-500/30'
-                    : 'hover:bg-white/5'
-                    }`}
+                  className={`flex flex-col items-center justify-center pt-1 w-[58px] h-[58px] rounded-2xl transition-all duration-300 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg shadow-blue-500/30'
+                      : 'hover:bg-white/5'
+                  }`}
                 >
                   <item.icon
-                    className={`w-5 h-5 ${isActive
-                      ? 'text-white'
-                      : 'text-gray-300'
-                      }`}
+                    className={`w-5 h-5 ${
+                      isActive ? 'text-white' : 'text-gray-300'
+                    }`}
                   />
 
                   <span
-                    className={`text-[10px] mt-0.5 leading-none ${isActive
-                      ? 'text-white font-semibold'
-                      : 'text-gray-400'
-                      }`}
+                    className={`text-[10px] mt-0.5 leading-none ${
+                      isActive ? 'text-white font-semibold' : 'text-gray-400'
+                    }`}
                   >
                     {item.label}
                   </span>
@@ -495,23 +513,22 @@ px-3
                   key={index}
                   type="button"
                   onClick={() => navigate(item.path)}
-                  className={`flex flex-col items-center justify-center pt-1 w-[58px] h-[58px] rounded-2xl transition-all duration-300 ${isActive
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg shadow-blue-500/30'
-                    : 'hover:bg-white/5'
-                    }`}
+                  className={`flex flex-col items-center justify-center pt-1 w-[58px] h-[58px] rounded-2xl transition-all duration-300 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg shadow-blue-500/30'
+                      : 'hover:bg-white/5'
+                  }`}
                 >
                   <item.icon
-                    className={`w-5 h-5 ${isActive
-                      ? 'text-white'
-                      : 'text-gray-300'
-                      }`}
+                    className={`w-5 h-5 ${
+                      isActive ? 'text-white' : 'text-gray-300'
+                    }`}
                   />
 
                   <span
-                    className={`text-[10px] mt-0.5 leading-none ${isActive
-                      ? 'text-white font-semibold'
-                      : 'text-gray-400'
-                      }`}
+                    className={`text-[10px] mt-0.5 leading-none ${
+                      isActive ? 'text-white font-semibold' : 'text-gray-400'
+                    }`}
                   >
                     {item.label}
                   </span>
@@ -543,7 +560,10 @@ border-4 border-white dark:border-[#121826]
               : 'Cart, empty'
           }
         >
-          <MdOutlineShoppingCart className="w-5 h-5 text-white" aria-hidden="true" />
+          <MdOutlineShoppingCart
+            className="w-5 h-5 text-white"
+            aria-hidden="true"
+          />
           <span
             className="text-[10px] mt-0.5 leading-none text-white dark:text-white"
             style={{ fontFamily: 'Inter, sans-serif' }}
@@ -551,7 +571,10 @@ border-4 border-white dark:border-[#121826]
             Cart
           </span>
           {getCartCount() > 0 && (
-            <span className="absolute top-2 right-4 bg-[#EF4444] text-white text-xs w-4 h-4 flex items-center justify-center rounded-full" aria-hidden="true">
+            <span
+              className="absolute top-2 right-4 bg-[#EF4444] text-white text-xs w-4 h-4 flex items-center justify-center rounded-full"
+              aria-hidden="true"
+            >
               {cartCount}
             </span>
           )}

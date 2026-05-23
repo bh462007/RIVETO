@@ -99,7 +99,7 @@ function Registration() {
         [name]: '',
       }));
     }
-  }; 
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -115,7 +115,7 @@ function Registration() {
       });
 
       toast.success('OTP send successfully 🎉');
-      setStep("2");
+      setStep('2');
     } catch (error) {
       console.error('Registration failed:', error);
       const errorMessage =
@@ -128,27 +128,30 @@ function Registration() {
   };
 
   const verifyOtp = async () => {
-  setOtpLoading(true);
+    setOtpLoading(true);
 
-  try {
-    await axios.post(`${serverUrl}/api/auth/verify-otp`, {
-      email: formData.email,
-      otp,
-    },{withCredentials: true});
+    try {
+      await axios.post(
+        `${serverUrl}/api/auth/verify-otp`,
+        {
+          email: formData.email,
+          otp,
+        },
+        { withCredentials: true }
+      );
 
-    toast.success("Account verified successfully 🎉");
+      toast.success('Account verified successfully 🎉');
 
-    getCurrentUser();
-    navigate("/");
-  } catch (error) {
-    console.error(error);
-    const msg =
-      error.response?.data?.message || "OTP verification failed";
-    toast.error(msg);
-  } finally {
-    setOtpLoading(false);
-  }
-};
+      getCurrentUser();
+      navigate('/');
+    } catch (error) {
+      console.error(error);
+      const msg = error.response?.data?.message || 'OTP verification failed';
+      toast.error(msg);
+    } finally {
+      setOtpLoading(false);
+    }
+  };
 
   const googleSignup = async () => {
     setGoogleLoading(true);

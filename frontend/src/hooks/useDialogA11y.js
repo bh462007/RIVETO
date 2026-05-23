@@ -16,7 +16,7 @@ export function useFocusTrap(isActive, containerRef) {
       if (event.key !== 'Tab') return;
 
       const focusable = Array.from(
-        container.querySelectorAll(FOCUSABLE_SELECTOR),
+        container.querySelectorAll(FOCUSABLE_SELECTOR)
       );
       if (focusable.length === 0) return;
 
@@ -51,7 +51,7 @@ export function useEscapeKey(isActive, onEscape) {
     (event) => {
       if (event.key === 'Escape') onEscape();
     },
-    [onEscape],
+    [onEscape]
   );
 
   useEffect(() => {
@@ -64,7 +64,13 @@ export function useEscapeKey(isActive, onEscape) {
 /**
  * Arrow-key navigation for tablists, radiogroups, and similar controls.
  */
-export function handleRovingKeyDown(event, items, currentIndex, onSelect, orientation = 'horizontal') {
+export function handleRovingKeyDown(
+  event,
+  items,
+  currentIndex,
+  onSelect,
+  orientation = 'horizontal'
+) {
   const isHorizontal = orientation === 'horizontal';
   const prevKey = isHorizontal ? 'ArrowLeft' : 'ArrowUp';
   const nextKey = isHorizontal ? 'ArrowRight' : 'ArrowDown';
@@ -88,6 +94,8 @@ export function handleRovingKeyDown(event, items, currentIndex, onSelect, orient
   }
 
   onSelect(items[nextIndex], nextIndex);
-  const focusTarget = document.getElementById(`roving-item-${items[nextIndex]}`);
+  const focusTarget = document.getElementById(
+    `roving-item-${items[nextIndex]}`
+  );
   focusTarget?.focus();
 }
