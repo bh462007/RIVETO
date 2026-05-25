@@ -41,7 +41,7 @@ export const sendOTP = async (req, res) => {
     });
     try {
       await sendMail(email, otpTemplate(otp));
-    } catch (error) {
+    } catch (_error) {
       await TempUser.deleteOne({ email });
 
       return res.status(500).json({
