@@ -115,7 +115,7 @@ function Cart() {
           Continue Shopping
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.7fr_0.9fr] gap-6 items-start">
           {/* Cart Items */}
           <div className="lg:col-span-2">
             {cartData.length === 0 ? (
@@ -178,9 +178,9 @@ function Cart() {
                   return (
                     <li
                       key={index}
-                      className="bg-[#0f172a] border border-[#1f2a44] rounded-lg p-5 hover:border-blue-500/40 transition-all duration-200"
+                      className="bg-[#0f172a] border border-[#1f2a44] rounded-lg p-4 hover:border-blue-500/40 transition-all duration-200"
                     >
-                      <div className="flex flex-col md:flex-row gap-5">
+                      <div className="flex flex-col md:flex-row gap-4 items-center md:items-start">
                         {/* Product Image */}
                         <div className="shrink-0">
                           <img
@@ -220,7 +220,7 @@ function Cart() {
                         </div>
 
                         {/* Quantity Controls */}
-                        <div className="flex flex-col items-end justify-between">
+                        <div className="flex flex-row md:flex-col items-center md:items-end justify-between gap-4">
                           <button
                             type="button"
                             onClick={() =>
@@ -295,8 +295,8 @@ function Cart() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 space-y-6">
-              <div className="bg-linear-to-br from-white to-slate-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-slate-200 dark:border-gray-700 p-6">
+            <div className={`space-y-5 self-start ${cartData.length >2 ?'lg:sticky lg:top-24':''}`}>
+              <div className="bg-linear-to-br from-white to-slate-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-slate-200 dark:border-gray-700 p-5">
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                   <RiShoppingBag3Line className="w-5 h-5 text-cyan-400" />
                   Order Summary

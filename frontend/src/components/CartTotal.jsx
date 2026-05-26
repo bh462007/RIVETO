@@ -48,7 +48,7 @@ function CartTotal() {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full h-fit">
       <div className="text-center mb-6">
         <Title text1={'ORDER'} text2={'SUMMARY'} />
       </div>
