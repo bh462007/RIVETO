@@ -11,6 +11,7 @@ import {
   FaEnvelope,
   FaMapMarkerAlt,
   FaHeart,
+  FaXTwitter,
 } from 'react-icons/fa';
 import { RiCustomerService2Fill } from 'react-icons/ri';
 import { BiSupport } from 'react-icons/bi';
@@ -104,7 +105,7 @@ function Footer() {
                 name: 'Facebook',
               },
               {
-                icon: <span className="text-lg font-bold">𝕏</span>,
+                icon: <FaXTwitter className="w-4 h-4" />,
                 color: 'hover:bg-black dark:hover:bg-white',
                 name: 'X',
               },
