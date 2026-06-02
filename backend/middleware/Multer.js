@@ -22,7 +22,12 @@ const MIME_TYPE_EXTENSIONS = {
 
 export const uploadDestination = path.resolve(__dirname, "../public/uploads");
 
-fs.mkdirSync(uploadDestination, { recursive: true });
+try {
+  fs.mkdirSync(uploadDestination, { recursive: true });
+} catch (err) {
+  console.error("Failed to create upload directory:", err);
+  process.exit(1);
+}
 
 export const createSafeImageFilename = (file) => {
   const extension = MIME_TYPE_EXTENSIONS[file.mimetype] || ".jpg";
