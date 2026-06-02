@@ -55,7 +55,8 @@ const storage = multer.diskStorage({
     cb(null, createSafeImageFilename(file));
   },
 });
-let upload = multer({
+
+const upload = multer({
   storage,
   limits: {
     fileSize: MAX_IMAGE_UPLOAD_SIZE,
