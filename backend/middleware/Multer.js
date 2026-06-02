@@ -25,8 +25,9 @@ export const uploadDestination = path.resolve(__dirname, "../public/uploads");
 try {
   fs.mkdirSync(uploadDestination, { recursive: true });
 } catch (err) {
-  console.error("Failed to create upload directory:", err);
-  process.exit(1);
+  throw new Error(`Failed to create upload directory: ${uploadDestination}`, {
+    cause: err,
+  });
 }
 
 export const createSafeImageFilename = (file) => {
