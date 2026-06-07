@@ -27,10 +27,6 @@ function ShopContext({ children }) {
   const delivery_fee = 40;
   //wishlist functions
   const fetchWishlist = async () => {
-    try {
-      const response = await apiConfig.get('/wishlist');
- //wishlist functions
-  const fetchWishlist = async () => {
     setLoadingWishlist(true);
     setWishlistError(null);
     try {
@@ -47,18 +43,7 @@ function ShopContext({ children }) {
       setLoadingWishlist(false);
     }
   };
-const addToWishlist = async (productId) => {
-  try {
-    const response = await apiConfig.post('/wishlist/add', { productId });
 
-      if (response.data.success) {
-        setWishlist(response.data.wishlist);
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    }
-  };
   const addToWishlist = async (productId) => {
     try {
       const response = await apiConfig.post('/wishlist/add', { productId });
@@ -289,13 +274,10 @@ const addToWishlist = async (productId) => {
     removeFromCompare,
     comparePanelOpen,
     toggleComparePanel,
-    wishlist,
+    wishlist, loadingWishlist, wishlistError,
     addToWishlist,
     fetchWishlist,
     removeFromWishlist,
-    setCartItem, UpdateQuantity, getCartAmount,
-    compareList, toggleCompare, removeFromCompare, comparePanelOpen, toggleComparePanel,
-    wishlist, loadingWishlist, wishlistError, addToWishlist, fetchWishlist, removeFromWishlist
   };
 
   return (

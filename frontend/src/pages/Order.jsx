@@ -2,23 +2,14 @@ import { useContext, useEffect, useState, useRef } from 'react';
 import { shopDataContext } from '../context/ShopContext';
 import apiConfig from '../utils/apiConfig';
 import {
-  FaBox,
-  FaShoppingBag,
-  FaShippingFast,
-  FaCheckCircle,
-  FaClock,
-  FaMapMarkerAlt,
-  FaUndo,
+  FaBox, FaShoppingBag, FaShippingFast, FaCheckCircle,
+  FaClock, FaMapMarkerAlt, FaUndo, FaCalendarAlt, FaMoneyBillWave, FaStar,
 } from 'react-icons/fa';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FaCalendarAlt, FaMoneyBillWave, FaStar } from 'react-icons/fa';
-import { FaBox, FaShoppingBag, FaShippingFast, FaCheckCircle, FaClock, FaMapMarkerAlt, FaUndo, FaCalendarAlt, FaMoneyBillWave, FaStar } from 'react-icons/fa';
 import { GiReceiveMoney } from 'react-icons/gi';
 import Title from '../components/Title';
 import { LoadingState, EmptyState, ErrorState } from '../components/StateComponents';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 

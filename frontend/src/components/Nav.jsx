@@ -7,8 +7,6 @@ import { IoMdHome } from 'react-icons/io';
 import { HiOutlineCollection } from 'react-icons/hi';
 
 import { RiContactsLine } from 'react-icons/ri';
-import { HiOutlineCollection } from 'react-icons/hi';
-import { RiContactsLine } from 'react-icons/ri';
 import { BsSearch, BsSun, BsMoon, BsBoxSeam } from 'react-icons/bs';
 import { FaUserCircle, FaHeart } from 'react-icons/fa';
 import { MdOutlineShoppingCart, MdLogout } from 'react-icons/md';
