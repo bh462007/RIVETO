@@ -4,6 +4,8 @@ import { shopDataContext } from '../context/ShopContext';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { FaArrowRight, FaChevronLeft, FaChevronRight, FaFire } from 'react-icons/fa';
+import Card from '../components/Card';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -17,6 +19,46 @@ function BestSeller() {
   const cardsRef = useRef([]);
   const scrollContainerRef = useRef(null);
   const autoScrollRef = useRef(null);
+
+  const statsRef = useRef(null);
+
+  const [unitsSold, setUnitsSold] = useState(0);
+  const [rating, setRating] = useState(0);
+  const [shipping, setShipping] = useState(0);
+  const [support, setSupport] = useState(0);
+
+  useEffect(() => {
+    if (!statsRef.current) return;
+
+    const animateCounter = (setter, endValue, duration = 2000) => {
+      let start = 0;
+
+      const increment = endValue / (duration / 16);
+
+      const timer = setInterval(() => {
+        start += increment;
+
+        if (start >= endValue) {
+          setter(endValue);
+          clearInterval(timer);
+        } else {
+          setter(Math.floor(start));
+        }
+      }, 16);
+    };
+
+    ScrollTrigger.create({
+      trigger: statsRef.current,
+      start: "top 80%",
+      once: true,
+      onEnter: () => {
+        animateCounter(setUnitsSold, 10000);
+        animateCounter(setRating, 49);
+        animateCounter(setShipping, 24);
+        animateCounter(setSupport, 24);
+      },
+    });
+  }, [bestseller]);
 
   useEffect(() => {
     const filterProduct = product.filter((item) => item.bestseller);
@@ -247,13 +289,16 @@ function BestSeller() {
             </div>
 
             {/* Trust Strip */}
-            <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 bg-[#121826] rounded-2xl p-6 border border-gray-700/50">
+            <div
+              ref={statsRef}
+              className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 bg-[#121826] rounded-2xl p-6 border border-gray-700/50"
+            >
               <div className="text-center">
                 <div
                   className="text-2xl md:text-3xl font-bold text-[#4F8CFF] mb-1"
                   style={{ fontFamily: 'Poppins, sans-serif' }}
                 >
-                  10K+
+                  {unitsSold.toLocaleString()}+
                 </div>
                 <div
                   className="text-gray-400 text-xs md:text-sm"
@@ -267,7 +312,7 @@ function BestSeller() {
                   className="text-2xl md:text-3xl font-bold text-[#4F8CFF] mb-1"
                   style={{ fontFamily: 'Poppins, sans-serif' }}
                 >
-                  4.9★
+                  {(rating / 10).toFixed(1)}★
                 </div>
                 <div
                   className="text-gray-400 text-xs md:text-sm"
@@ -281,7 +326,7 @@ function BestSeller() {
                   className="text-2xl md:text-3xl font-bold text-[#4F8CFF] mb-1"
                   style={{ fontFamily: 'Poppins, sans-serif' }}
                 >
-                  24H
+                  {shipping}H
                 </div>
                 <div
                   className="text-gray-400 text-xs md:text-sm"
@@ -295,7 +340,7 @@ function BestSeller() {
                   className="text-2xl md:text-3xl font-bold text-[#4F8CFF] mb-1"
                   style={{ fontFamily: 'Poppins, sans-serif' }}
                 >
-                  24/7
+                  {support}/7
                 </div>
                 <div
                   className="text-gray-400 text-xs md:text-sm"

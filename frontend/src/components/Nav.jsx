@@ -1,22 +1,19 @@
-import {
-  useContext,
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-} from 'react';
+import { useContext, useState, useRef, useEffect, useCallback } from 'react';
 
 import { useFocusTrap, useEscapeKey } from '../hooks/useDialogA11y';
 
-
 import { IoMdHome } from 'react-icons/io';
 
-import {
-  HiOutlineCollection
-} from 'react-icons/hi';
+import { HiOutlineCollection } from 'react-icons/hi';
 
 import { RiContactsLine } from 'react-icons/ri';
-
+import { HiOutlineCollection } from 'react-icons/hi';
+import { RiContactsLine } from 'react-icons/ri';
+import { BsSearch, BsSun, BsMoon, BsBoxSeam } from 'react-icons/bs';
+import { FaUserCircle, FaHeart } from 'react-icons/fa';
+import { MdOutlineShoppingCart, MdLogout } from 'react-icons/md';
+import { FiLogIn, FiInfo } from 'react-icons/fi';
+import { IoSearchCircleOutline } from 'react-icons/io5';
 
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -31,13 +28,8 @@ import gsap from 'gsap';
 function Nav() {
   const { getCurrentUser, userData } = useContext(userDataContext);
 
-  const {
-    showSearch,
-    setShowSearch,
-    search,
-    setSearch,
-    getCartCount,
-  } = useContext(shopDataContext);
+  const { showSearch, setShowSearch, search, setSearch, getCartCount } =
+    useContext(shopDataContext);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
 
@@ -154,6 +146,7 @@ function Nav() {
       getCurrentUser();
       navigate('/login');
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Logout Error:', error);
     }
   };
@@ -180,7 +173,6 @@ function Nav() {
         } border-b border-gray-200/50 dark:border-gray-800/50`}
       >
         <div className="max-w-[1440px] mx-auto px-3 md:px-6 flex justify-between items-center h-16">
-
           {/* LOGO */}
           <button
             ref={logoRef}
@@ -235,7 +227,6 @@ function Nav() {
             ref={iconsRef}
             className="flex items-center gap-4 md:gap-5 relative"
           >
-
             {/* SEARCH */}
             <button
               type="button"
@@ -311,10 +302,7 @@ function Nav() {
             className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 flex justify-center border-t border-gray-200 dark:border-gray-700"
           >
             <div className="w-full md:w-[60%] relative">
-
-              <BsSearch
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"
-              />
+              <BsSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
 
               <input
                 type="search"
@@ -334,12 +322,10 @@ function Nav() {
             ref={profileRef}
             className="absolute top-full right-4 mt-2 w-64 bg-white dark:bg-[#111c33] shadow-2xl rounded-xl border border-gray-200 dark:border-[#1f2a44] z-40 overflow-hidden"
           >
-
             {/* USER INFO */}
             {userData && (
               <div className="px-4 py-4 border-b border-gray-200 dark:border-[#1f2a44] bg-gray-50 dark:bg-[#0f172a]">
                 <div className="flex items-center gap-3">
-
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold">
                     {userData?.name?.charAt(0)?.toUpperCase()}
                   </div>
@@ -359,7 +345,6 @@ function Nav() {
 
             {/* MENU */}
             <div className="py-2">
-
               {/* LOGIN */}
               {!userData && (
                 <button
@@ -484,11 +469,8 @@ function Nav() {
       </header>
 
       {/* MOBILE NAV */}
-      <nav
-        className="fixed bottom-5 left-1/2 -translate-x-1/2 w-[92%] max-w-sm h-[72px] md:hidden z-[999] flex items-center justify-around rounded-[28px] border border-white/10 bg-[#0F172A]/80 backdrop-blur-2xl shadow-[0_8px_30px_rgba(0,0,0,0.35)] px-3"
-      >
+      <nav className="fixed bottom-5 left-1/2 -translate-x-1/2 w-[92%] max-w-sm h-[72px] md:hidden z-[999] flex items-center justify-around rounded-[28px] border border-white/10 bg-[#0F172A]/80 backdrop-blur-2xl shadow-[0_8px_30px_rgba(0,0,0,0.35)] px-3">
         <div className="flex items-center justify-between w-full px-2">
-
           {/* LEFT */}
           <div className="flex items-center gap-2">
             {[
@@ -524,9 +506,7 @@ function Nav() {
 
                   <span
                     className={`text-[10px] mt-0.5 ${
-                      isActive
-                        ? 'text-white font-semibold'
-                        : 'text-gray-400'
+                      isActive ? 'text-white font-semibold' : 'text-gray-400'
                     }`}
                   >
                     {item.label}
@@ -568,9 +548,7 @@ function Nav() {
 
                   <span
                     className={`text-[10px] mt-0.5 ${
-                      isActive
-                        ? 'text-white font-semibold'
-                        : 'text-gray-400'
+                      isActive ? 'text-white font-semibold' : 'text-gray-400'
                     }`}
                   >
                     {item.label}
@@ -590,9 +568,7 @@ function Nav() {
           <div className="flex flex-col items-center">
             <MdOutlineShoppingCart className="w-5 h-5 text-white" />
 
-            <span className="text-[10px] text-white">
-              Cart
-            </span>
+            <span className="text-[10px] text-white">Cart</span>
           </div>
 
           {cartCount > 0 && (

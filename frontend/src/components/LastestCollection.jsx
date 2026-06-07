@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import mobvid from '../assets/4 Mobile.mp4';
 
 import gsap from 'gsap';
+import { FaCompress, FaExpand, FaPause, FaPlay } from 'react-icons/fa';
+import Card from '../components/Card';
 
 function LatestCollection() {
   const { product, compareList, toggleCompare } = useContext(shopDataContext);
@@ -56,6 +58,7 @@ function LatestCollection() {
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       videoRef.current.requestFullscreen().catch((err) => {
+        // eslint-disable-next-line no-console
         console.error(`Error attempting to enable fullscreen: ${err.message}`);
       });
       setIsFullscreen(true);

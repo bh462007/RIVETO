@@ -1,12 +1,25 @@
 import { useContext, useState, useEffect } from 'react';
 import { shopDataContext } from '../context/ShopContext';
-import { authDataContext } from "../context/UserContext"
 import apiConfig from '../utils/apiConfig';
 import { useNavigate } from 'react-router-dom';
 import { FaMoneyBillWave } from 'react-icons/fa';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { userDataContext } from '../context/UserContext';
+import {
+  FaCheckCircle,
+  FaCity,
+  FaEnvelope,
+  FaGlobe,
+  FaLock,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaShippingFast,
+  FaUser,
+} from 'react-icons/fa';
+import { RiSecurePaymentLine } from 'react-icons/ri';
+import Title from '../components/Title';
+import CartTotal from '../components/CartTotal';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -132,6 +145,7 @@ function PlaceOrder() {
         navigate('/order');
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error placing order:', error);
       setIsProcessing(false);
     }
@@ -403,7 +417,7 @@ function PlaceOrder() {
 
                 <div className="space-y-4">
                   {paymentMethods.map((payment) => {
-                    const _IconComponent = payment.icon;
+                    const IconComponent = payment.icon;
                     return (
                       <div
                         key={payment.id}
