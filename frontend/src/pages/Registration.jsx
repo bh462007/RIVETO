@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import apiConfig from '../utils/apiConfig';
 import { signInWithPopup } from 'firebase/auth';
@@ -7,6 +7,14 @@ import { auth, provider } from '../../utils/Firebase';
 import { userDataContext } from '../context/UserContext';
 import gsap from 'gsap';
 import { toast } from 'react-toastify';
+import { FcGoogle } from 'react-icons/fc';
+import {
+  IoEye,
+  IoEyeOutline,
+  IoLockClosed,
+  IoMail,
+  IoPerson,
+} from 'react-icons/io5';
 
 function Registration() {
   const [show, setShow] = useState(false);
@@ -123,7 +131,6 @@ function Registration() {
       toast.success('Account verified successfully 🎉');
       getCurrentUser();
       navigate('/');
-
     } catch {
       // API errors are shown by the global interceptor.
     } finally {
@@ -137,19 +144,17 @@ function Registration() {
       const response = await signInWithPopup(auth, provider);
       const user = response.user;
 
-      await apiConfig.post(
-        '/auth/googlelogin',
-        {
-          name: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-        }
-      );
+      await apiConfig.post('/auth/googlelogin', {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      });
 
       getCurrentUser();
       toast.success('Welcome to Riveto! 🎉');
       navigate('/');
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Google Signup Error:', error);
       if (!error.response) {
         toast.error('Google signup failed. Please try again.');
@@ -304,19 +309,19 @@ function Registration() {
                   />
                   <label htmlFor="terms" className="text-gray-300 text-sm">
                     I agree to the{' '}
-                    <button
-                      type="button"
-                      className="text-cyan-400 hover:underline"
+                    <Link
+                      to="/terms"
+                      className="text-cyan-400 hover:underline focus:outline-none focus:ring-1 focus:ring-cyan-400 rounded"
                     >
                       Terms of Service
-                    </button>{' '}
+                    </Link>{' '}
                     and{' '}
-                    <button
-                      type="button"
-                      className="text-cyan-400 hover:underline"
+                    <Link
+                      to="/privacy"
+                      className="text-cyan-400 hover:underline focus:outline-none focus:ring-1 focus:ring-cyan-400 rounded"
                     >
                       Privacy Policy
-                    </button>
+                    </Link>
                   </label>
                 </div>
 

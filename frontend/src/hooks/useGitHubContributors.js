@@ -51,6 +51,7 @@ const useGitHubContributors = (
 
         setError(null);
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching GitHub data:', err);
         setError('Failed to load contributor data. Please try again later.');
       } finally {

@@ -211,6 +211,7 @@ const ProfileCardComponent = ({
               );
             }
           })
+          // eslint-disable-next-line no-console
           .catch((err) => console.error(err));
       } else {
         window.addEventListener('deviceorientation', deviceOrientationHandler);

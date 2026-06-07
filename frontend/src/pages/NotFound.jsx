@@ -20,15 +20,21 @@ function NotFound() {
     <div className="relative min-h-screen bg-[#0B0F1A] flex items-center justify-center overflow-hidden px-4">
       {/* Animated background grid */}
       <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `linear-gradient(rgba(37, 99, 235, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(37, 99, 235, 0.1) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px'
-        }}></div>
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(rgba(37, 99, 235, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(37, 99, 235, 0.1) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px',
+          }}
+        ></div>
       </div>
 
       {/* Glowing orbs */}
       <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div
+        className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"
+        style={{ animationDelay: '1s' }}
+      ></div>
 
       {/* Main content */}
       <div
@@ -51,7 +57,8 @@ function NotFound() {
             Page Not Found
           </h1>
           <p className="text-gray-400 text-base md:text-lg max-w-md mx-auto mb-8">
-            The page you are looking for doesn't exist or has been moved. Let's get you back on track.
+            The page you are looking for doesn't exist or has been moved. Let's
+            get you back on track.
           </p>
 
           {/* Action buttons */}

@@ -82,14 +82,27 @@ const NewArrivals = () => {
         {newArrivals.length === 0 ? (
           <div className="text-center py-20 bg-[#0f172a]/50 backdrop-blur-sm border border-[#1f2a44] rounded-2xl max-w-lg mx-auto">
             <div className="w-16 h-16 mx-auto mb-4 bg-[#111c33] border border-[#1f2a44] rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              <svg
+                className="w-8 h-8 text-gray-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                />
               </svg>
             </div>
             <p className="text-gray-500 text-lg">No new arrivals found.</p>
           </div>
         ) : (
-          <div ref={gridRef} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-8">
+          <div
+            ref={gridRef}
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-8"
+          >
             {newArrivals.map((item, index) => (
               <motion.div
                 key={item._id}

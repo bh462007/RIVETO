@@ -1,11 +1,40 @@
 import { useContext } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import { RiPriceTag3Line } from 'react-icons/ri';
 import './App.css';
-import { userDataContext } from './context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { userDataContext } from './context/UserContext';
 import { shopDataContext } from './context/ShopContext';
+
+// Components
+import Nav from './components/Nav';
 import BackToTop from './components/BackToTop';
+import Login from './pages/Login';
+import Registration from './pages/Registration';
+import Home from './pages/Home';
+import About from './pages/About';
+import Wishlist from './pages/wishlist';
+import Collections from './pages/Collections';
+import NewArrivals from './pages/NewArrivals';
+import BestSellers from './pages/BestSellers';
+import Recommendations from './pages/Recommendations';
+import Product from './pages/Product';
+import Contact from './pages/Contact';
+import ProductDetail from './pages/ProductDetail';
+import Cart from './pages/Cart';
+import PlaceOrder from './pages/PlaceOrder';
+import FaqPage from './pages/FaqPage';
+import Order from './pages/Order';
+import PrivicyPolicy from './pages/PrivicyPolicy';
+import TermsAndServices from './pages/TermsAndServices';
+import SizeGuide from './pages/SizeGuide';
+import CookiePolicy from './pages/CookiePolicy';
+import Contributors from './pages/Contributors';
+import NotFound from './pages/NotFound';
+import Ai from './components/Ai';
+import ComparisonPanel from './components/ComparisonPanel';
 
 function App() {
   const { userData } = useContext(userDataContext);
@@ -179,7 +208,9 @@ function App() {
         />
 
         {/* Public routes - Legal pages should be accessible without login */}
+        <Route path="/privacy" element={<PrivicyPolicy />} />
         <Route path="/privicypolicy" element={<PrivicyPolicy />} />
+        <Route path="/terms" element={<TermsAndServices />} />
         <Route path="/termsandservices" element={<TermsAndServices />} />
         <Route path="/size-guide" element={<SizeGuide />} />
         <Route path="/cookie-policy" element={<CookiePolicy />} />
