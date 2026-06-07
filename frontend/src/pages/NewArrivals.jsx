@@ -1,5 +1,6 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import gsap from 'gsap';
 import { shopDataContext } from '../context/ShopContext';
 import Card from '../components/Card';
 import Title from '../components/Title';
