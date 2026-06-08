@@ -20,8 +20,6 @@ function ShopContext({ children }) {
 
   const { userData } = useContext(userDataContext); //
   const [wishlist, setWishlist] = useState([]);
-  const [loadingWishlist, setLoadingWishlist] = useState(false);
-  const [wishlistError, setWishlistError] = useState(null);
 
   const currency = '₹';
   const delivery_fee = 40;
@@ -33,12 +31,16 @@ function ShopContext({ children }) {
       const response = await apiConfig.get('/wishlist');
       if (response.data.success) {
         setWishlist(response.data.wishlist);
-      } else {
-        setWishlistError(response.data.message || 'Failed to fetch wishlist');
       }
     } catch (error) {
       console.log(error);
-      setWishlistError(error.response?.data?.message || error.message || 'Failed to fetch wishlist');
+      // eslint-disable-next-line no-console
+      console.error(error);
+      setWishlistError(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to fetch wishlist'
+      );
     } finally {
       setLoadingWishlist(false);
     }
@@ -93,8 +95,11 @@ function ShopContext({ children }) {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error fetching products:', error);
-      console.log('Error fetching products:', error);
-      setProductsError(error.response?.data?.message || error.message || 'Failed to load products.');
+      setProductsError(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to load products.'
+      );
     } finally {
       setLoadingProducts(false);
     }
@@ -141,8 +146,9 @@ function ShopContext({ children }) {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error fetching cart:', error);
-      console.log('❌ Error fetching cart:', error);
-      setCartError(error.response?.data?.message || error.message || 'Failed to load cart.');
+      setCartError(
+        error.response?.data?.message || error.message || 'Failed to load cart.'
+      );
     } finally {
       setLoadingCart(false);
     }
@@ -234,9 +240,9 @@ function ShopContext({ children }) {
     setComparePanelOpen(state !== undefined ? state : !comparePanelOpen);
   };
 
-   
   useEffect(() => {
     getProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     if (userData) {

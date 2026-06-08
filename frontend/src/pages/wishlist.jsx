@@ -1,7 +1,11 @@
 import { useContext, useEffect } from 'react';
 import { shopDataContext } from '../context/ShopContext';
 import { useNavigate } from 'react-router-dom';
-import { LoadingState, EmptyState, ErrorState } from '../components/StateComponents';
+import {
+  LoadingState,
+  EmptyState,
+  ErrorState,
+} from '../components/StateComponents';
 import { FaHeart, FaTrash } from 'react-icons/fa';
 
 function Wishlist() {
@@ -33,13 +37,17 @@ function Wishlist() {
       </div>
 
       {wishlistError ? (
-        <ErrorState 
-          title="Failed to Load Wishlist" 
-          message={wishlistError} 
-          onRetry={fetchWishlist} 
+        <ErrorState
+          title="Failed to Load Wishlist"
+          message={wishlistError}
+          onRetry={fetchWishlist}
         />
       ) : loadingWishlist ? (
-        <LoadingState type="card" count={4} message="Loading your wishlist..." />
+        <LoadingState
+          type="card"
+          count={4}
+          message="Loading your wishlist..."
+        />
       ) : wishlist.length === 0 ? (
         <EmptyState
           icon={FaHeart}

@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { shopDataContext } from '../context/ShopContext';
 import apiConfig from '../utils/apiConfig';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   FaBox, FaShoppingBag, FaShippingFast, FaCheckCircle,
   FaClock, FaMapMarkerAlt, FaUndo, FaCalendarAlt, FaMoneyBillWave, FaStar,
@@ -10,6 +12,24 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GiReceiveMoney } from 'react-icons/gi';
 import Title from '../components/Title';
 import { LoadingState, EmptyState, ErrorState } from '../components/StateComponents';
+  FaBox,
+  FaShoppingBag,
+  FaShippingFast,
+  FaCheckCircle,
+  FaClock,
+  FaMapMarkerAlt,
+  FaUndo,
+  FaCalendarAlt,
+  FaMoneyBillWave,
+  FaStar,
+} from 'react-icons/fa';
+import { GiReceiveMoney } from 'react-icons/gi';
+import Title from '../components/Title';
+import {
+  LoadingState,
+  EmptyState,
+  ErrorState,
+} from '../components/StateComponents';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -46,8 +66,11 @@ function Order() {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error loading orders:', error);
-      console.log('Error loading orders:', error);
-      setError(error.response?.data?.message || error.message || 'Failed to load orders.');
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to load orders.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -165,10 +188,10 @@ function Order() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-sky-100 dark:from-gray-900 dark:via-[#0f172a] dark:to-[#0c4a6e] flex items-center justify-center pt-24 px-4">
-        <ErrorState 
-          title="Failed to Load Orders" 
-          message={error} 
-          onRetry={loadOrderData} 
+        <ErrorState
+          title="Failed to Load Orders"
+          message={error}
+          onRetry={loadOrderData}
         />
       </div>
     );
@@ -178,7 +201,11 @@ function Order() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-sky-100 dark:from-gray-900 dark:via-[#0f172a] dark:to-[#0c4a6e] pt-28 pb-20 px-4 md:px-10">
         <div className="max-w-6xl mx-auto">
-          <LoadingState type="list" count={3} message="Loading your orders..." />
+          <LoadingState
+            type="list"
+            count={3}
+            message="Loading your orders..."
+          />
         </div>
       </div>
     );

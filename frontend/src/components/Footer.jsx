@@ -175,7 +175,7 @@ function Footer() {
               { name: 'Contact Us', to: '/contact' },
               { name: 'Size Guide', to: '/size-guide' },
               { name: 'FAQs', to: '/faq' },
-              { name: 'Privacy Policy', to: '/privicypolicy' },
+              { name: 'Privacy Policy', to: '/privacypolicy' },
               { name: 'Terms of Service', to: '/termsandservices' },
             ].map((item, index) => (
               <li key={index}>
@@ -299,7 +299,7 @@ function Footer() {
               Terms of Service
             </Link>
             <Link
-              to="/privicypolicy"
+              to="/privacypolicy"
               className="hover:text-cyan-400 transition-colors"
             >
               Privacy Policy

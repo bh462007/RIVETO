@@ -152,7 +152,7 @@ function Nav() {
   const cartCount = getCartCount();
 
   const navItems = [
-    { label: 'Home', path: '/' },
+    { label: 'Home', path: '/home' },
     { label: 'Collection', path: '/collection' },
     { label: 'Contributors', path: '/contributors' },
     { label: 'Recommendations', path: '/recommendations' },
@@ -175,7 +175,7 @@ function Nav() {
           <button
             ref={logoRef}
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/home')}
             className="flex items-center gap-5 bg-transparent border-0 p-0 cursor-pointer"
             aria-label="Riveto home"
           >
