@@ -7,29 +7,9 @@ import {
   FaBox, FaShoppingBag, FaShippingFast, FaCheckCircle,
   FaClock, FaMapMarkerAlt, FaUndo, FaCalendarAlt, FaMoneyBillWave, FaStar,
 } from 'react-icons/fa';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GiReceiveMoney } from 'react-icons/gi';
 import Title from '../components/Title';
 import { LoadingState, EmptyState, ErrorState } from '../components/StateComponents';
-  FaBox,
-  FaShoppingBag,
-  FaShippingFast,
-  FaCheckCircle,
-  FaClock,
-  FaMapMarkerAlt,
-  FaUndo,
-  FaCalendarAlt,
-  FaMoneyBillWave,
-  FaStar,
-} from 'react-icons/fa';
-import { GiReceiveMoney } from 'react-icons/gi';
-import Title from '../components/Title';
-import {
-  LoadingState,
-  EmptyState,
-  ErrorState,
-} from '../components/StateComponents';
 
 gsap.registerPlugin(ScrollTrigger);
 

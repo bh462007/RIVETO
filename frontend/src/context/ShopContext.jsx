@@ -20,6 +20,8 @@ function ShopContext({ children }) {
 
   const { userData } = useContext(userDataContext); //
   const [wishlist, setWishlist] = useState([]);
+  const [loadingWishlist, setLoadingWishlist] = useState(false);
+  const [wishlistError, setWishlistError] = useState(null);
 
   const currency = '₹';
   const delivery_fee = 40;
