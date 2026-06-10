@@ -35,7 +35,6 @@ function ShopContext({ children }) {
         setWishlist(response.data.wishlist);
       }
     } catch (error) {
-      console.log(error);
       // eslint-disable-next-line no-console
       console.error(error);
       setWishlistError(
