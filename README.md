@@ -5,7 +5,6 @@
 [![Stars](https://img.shields.io/github/stars/Nsanjayboruds/RIVETO)](https://github.com/Nsanjayboruds/RIVETO/stargazers)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11234/badge)](https://www.bestpractices.dev/projects/11234)
 ---
-
 ## 📑 Table of Contents
 
 - [🌍 Overview](#-overview)
