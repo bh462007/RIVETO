@@ -1,7 +1,6 @@
 import User from "../model/userModel.js";
 import validator from "validator";
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
 import { genToken, genToken1 } from "../config/Token.js";
 import { sendMail } from "../config/sendEmail.js";
 import generateOTP from "../utils/otp.js";
@@ -30,30 +29,26 @@ export const sendOTP = async (req, res) => {
 
     await TempUser.findOneAndDelete({ email });
 
-    const otp = generateOTP().toString();
-    if (process.env.NODE_ENV !== "production") {
-      console.log("------------------------------------------");
-      console.log(`SIGNUP OTP for ${email}: ${otp}`);
-      console.log("------------------------------------------");
-    }
-
-
+    const otp = generateOTP();
     const hashedPassword = await bcrypt.hash(password, 10);
-    const hashedOTP = await bcrypt.hash(otp, 10);
 
+    // save temp user
     await TempUser.create({
       name,
       email,
       password: hashedPassword,
-      otp: hashedOTP,
+      otp,
       otpExpire: new Date(Date.now() + 5 * 60 * 1000),
     });
     try {
       await sendMail(email, otpTemplate(otp));
     } catch (_error) {
-      console.log("Email could not be sent, but continuing for local testing.");
-      // In production, you would normally return an error here.
-      // For GSSoC/Local testing, we let it pass.
+      await TempUser.deleteOne({ email });
+
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send OTP email",
+      });
     }
 
 
@@ -77,21 +72,12 @@ export const verifyOTP = async (req, res) => {
       return res.status(400).json({ message: "User not found or OTP expired" });
     }
 
-    if (tempUser.otpExpire < new Date()) {
-      return res.status(400).json({
-        message: "OTP expired",
-      });
+    if (tempUser.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    const isValidOTP = await bcrypt.compare(
-      otp.toString(),
-      tempUser.otp
-    );
-
-    if (!isValidOTP) {
-      return res.status(400).json({
-        message: "Invalid OTP",
-      });
+    if (tempUser.otpExpire < new Date()) {
+      return res.status(400).json({ message: "OTP expired" });
     }
 
     const user = await User.create({
@@ -239,8 +225,9 @@ export const forgotPassword = async (req, res) => {
 
     await user.save();
 
-    // Create reset URL
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    // Create reset URL - Robust version
+    let frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    frontendUrl = frontendUrl.replace(/\/+$/, "");
     const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
     if (process.env.NODE_ENV !== "production") {
@@ -265,7 +252,11 @@ export const forgotPassword = async (req, res) => {
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
       await user.save();
-      return res.status(500).json({ message: "Email could not be sent" });
+      
+      console.error("EMAIL SENDING FAILED:", _error.message);
+      return res.status(500).json({ 
+        message: "Email could not be sent. Please check SMTP configuration (EMAIL_USER/EMAIL_PASS)." 
+      });
     }
   } catch (_error) {
     res.status(500).json({ message: _error.message });
@@ -275,13 +266,10 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   try {
     const rawToken = req.params.resetToken;
-    // Hash token from URL
     const resetPasswordToken = crypto
       .createHash("sha256")
       .update(rawToken)
       .digest("hex");
-
-    console.log("Searching for user with hashed token:", resetPasswordToken);
 
     const user = await User.findOne({
       resetPasswordToken,
@@ -289,7 +277,6 @@ export const resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      console.log("User not found with this token or token has expired.");
       return res.status(400).json({ message: "Invalid or expired reset token" });
     }
 
