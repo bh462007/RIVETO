@@ -1097,30 +1097,35 @@ function LandingPage() {
                 shoppers. Discover, shop, and express yourself.
               </p>
               <div className="mt-4 flex items-center gap-3">
-                {[
-                  {
-                    Icon: FaInstagram,
-                    label: 'Instagram',
-                    color: 'hover:text-pink-500',
-                    shadow: 'hover:shadow-[0_0_20px_rgba(225,48,108,0.45)]',
-                  },
-                  {
-                    Icon: FaXTwitter,
-                    label: 'X',
-                    color: 'hover:text-slate-100',
-                    shadow: 'hover:shadow-[0_0_20px_rgba(255,255,255,0.25)]',
-                  },
-                  {
-                    Icon: FaFacebook,
-                    label: 'Facebook',
-                    color: 'hover:text-blue-500',
-                    shadow: 'hover:shadow-[0_0_20px_rgba(24,119,242,0.45)]',
-                  },
-                ].map(({ Icon, label, color, shadow }) => (
-                  <a
-                    key={label}
-                    href="#"
-                    aria-label={`Follow Riveto on ${label}`}
+               {[
+  {
+    Icon: FaInstagram,
+    label: 'Instagram',
+    url: 'https://www.instagram.com',
+    color: 'hover:text-pink-500',
+    shadow: 'hover:shadow-[0_0_20px_rgba(225,48,108,0.45)]',
+  },
+  {
+    Icon: FaXTwitter,
+    label: 'X',
+    url: 'https://www.x.com',
+    color: 'hover:text-slate-100',
+    shadow: 'hover:shadow-[0_0_20px_rgba(255,255,255,0.25)]',
+  },
+  {
+    Icon: FaFacebook,
+    label: 'Facebook',
+    url: 'https://www.facebook.com',
+    color: 'hover:text-blue-500',
+    shadow: 'hover:shadow-[0_0_20px_rgba(24,119,242,0.45)]',
+  },
+].map(({ Icon, label, url, color, shadow }) => (
+  <a
+    key={label}
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={`Follow Riveto on ${label}`}
                     className={`w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-all duration-400 hover:scale-125 ${color} ${shadow}`}
                   >
                     <Icon className="w-4 h-4" aria-hidden="true" />
