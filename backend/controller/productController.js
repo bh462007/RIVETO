@@ -1,5 +1,6 @@
 import uploadOnCloudinary from "../config/Cloudinary.js";
 import Product from "../model/productModel.js";
+import Review from "../model/reviewModel.js";
 
 const safeUpload = async (fileArray) => {
   const filePath = fileArray?.[0]?.path;
@@ -111,12 +112,24 @@ export const listProducts = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const [products, total] = await Promise.all([
-      Product.find({}).sort({ _id: 1 }).skip(skip).limit(limit),
-      Product.countDocuments({}),
-    ]);
+  Product.find({}).sort({ _id: 1 }).skip(skip).limit(limit).lean(),
+  Product.countDocuments({}),
+]);
+const productsWithReviewCount = await Promise.all(
+  products.map(async (product) => {
+    const reviewCount = await Review.countDocuments({
+      productId: product._id,
+    });
+
+    return {
+      ...product,
+      reviewCount,
+    };
+  })
+);
 
     return res.status(200).json({
-      products,
+      products : productsWithReviewCount,
       pagination: {
         page,
         limit,
