@@ -22,6 +22,8 @@ import reviewRoutes from "./routes/reviewRoute.js";
 import wishlistRouter from "./routes/wishlistRoutes.js";
 import recommendationsRoute from "./routes/recommendations.js";
 import { globalIpLimiter } from "./middleware/rateLimiters.js";
+import errorHandler from "./middleware/errorHandler.js";
+
 
 const app = express();
 app.set("trust proxy", 1);
@@ -64,7 +66,9 @@ app.use("/api/recommendations", recommendationsRoute);
 app.use("/api/notifications", notificationRouter);
 app.use("/api", botRoute);
 
+
 app.get("/", (req, res) => res.send("Backend is running!"));
+app.use(errorHandler);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

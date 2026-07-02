@@ -47,9 +47,11 @@ export const addProduct = async (req, res) => {
     // Validate price before creating the product.
     const priceNumber = Number(price);
     if (price === undefined || price === null || Number.isNaN(priceNumber)) {
-      return res
-        .status(400)
-        .json({ message: "Invalid price. A numeric value is required." });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid price. A numeric value is required.",
+        errors: [],
+      });
     }
 
     // Safely parse sizes; handle invalid JSON or missing sizes gracefully.
@@ -59,22 +61,28 @@ export const addProduct = async (req, res) => {
         try {
           parsedSizes = JSON.parse(sizes);
           if (!Array.isArray(parsedSizes)) {
-            return res
-              .status(400)
-              .json({ message: "Invalid sizes: expected a JSON array." });
+            return res.status(400).json({
+              success: false,
+              message: "Invalid sizes: expected a JSON array.",
+              errors: [],
+            });
           }
         } catch (parseError) {
           console.error("❌ Invalid sizes JSON in addProduct:", parseError);
-          return res.status(400).json({ message: "Invalid sizes JSON." });
+          return res.status(400).json({
+            success: false,
+            message: "Invalid sizes JSON.",
+            errors: [],
+          });
         }
       } else if (Array.isArray(sizes)) {
         parsedSizes = sizes;
       } else {
-        return res
-          .status(400)
-          .json({
-            message: "Invalid sizes: expected an array or JSON string.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid sizes: expected an array or JSON string.",
+          errors: [],
+        });
       }
     }
 
@@ -96,9 +104,11 @@ export const addProduct = async (req, res) => {
     return res.status(201).json(createdProduct);
   } catch (error) {
     console.error("❌ Error in addProduct:", error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      errors: [error.message],
+    });
   }
 };
 
@@ -126,9 +136,11 @@ export const listProducts = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Error in listProducts:", error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      errors: [error.message],
+    });
   }
 };
 
@@ -141,8 +153,10 @@ export const removeProduct = async (req, res) => {
       .json({ message: "Product deleted successfully", product });
   } catch (error) {
     console.error("❌ Error in removeProduct:", error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      errors: [error.message],
+    });
   }
 };
