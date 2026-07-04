@@ -1,8 +1,19 @@
 import express from "express";
-import { sendOTP, login, logOut, googleLogin, verifyOTP, adminLogin, forgotPassword, resetPassword } from "../controller/authcontroller.js";
+import {
+  sendOTP,
+  login,
+  logOut,
+  googleLogin,
+  verifyOTP,
+  adminLogin,
+  forgotPassword,
+  resetPassword,
+  refreshToken,
+} from "../controller/authcontroller.js";
 import validateRequest from "../middleware/validateRequest.js";
 import { registerSchema, loginSchema } from "../validators/authSchemas.js";
 import { authIpLimiter, otpIpLimiter } from "../middleware/rateLimiters.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const authRoutes = express.Router();
 
@@ -40,6 +51,9 @@ authRoutes.post("/verify-otp", otpIpLimiter, verifyOTP);
  *                 token:
  *                   type: string
  *                   example: "eyJhbGciOiJIUzI1Ni..."
+ *                 refreshToken:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1Ni..."
  */
 authRoutes.post("/login", authIpLimiter, validateRequest(loginSchema), login);
 
@@ -53,7 +67,7 @@ authRoutes.post("/login", authIpLimiter, validateRequest(loginSchema), login);
  *       200:
  *         description: Successfully logged out
  */
-authRoutes.post("/logout", logOut);
+authRoutes.post("/logout", protect, logOut);
 
 /**
  * @swagger
@@ -63,7 +77,18 @@ authRoutes.post("/logout", logOut);
  *     tags: [Auth]
  *     responses:
  *       200:
- *         description: OK
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1Ni..."
+ *                 refreshToken:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1Ni..."
  */
 authRoutes.post("/googlelogin", authIpLimiter, googleLogin);
 
@@ -75,9 +100,32 @@ authRoutes.post("/googlelogin", authIpLimiter, googleLogin);
  *     tags: [Auth]
  *     responses:
  *       200:
- *         description: OK
+ *         description: Admin login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1Ni..."
+ *                 refreshToken:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1Ni..."
  */
 authRoutes.post("/adminlogin", authIpLimiter, adminLogin);
+
+/**
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Refresh access and refresh tokens
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Tokens refreshed successfully
+ */
+authRoutes.post("/refresh", refreshToken);
 
 authRoutes.post("/forgot-password", forgotPassword);
 authRoutes.put("/reset-password/:resetToken", resetPassword);

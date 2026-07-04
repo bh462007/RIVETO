@@ -332,3 +332,35 @@ MIT License. See [LICENSE](LICENSE) for details.
 ---
 
 > _Built with React, Tailwind, Node.js, Express, MongoDB, Razorpay, and Cloudinary_
+
+
+
+## 🔐 Authentication Flow
+
+This project implements a **secure JWT refresh token flow with rotation**:
+
+- **Login**  
+  Issues an **access token** (15 minutes expiry) and a **refresh token** (7 days expiry).  
+  Refresh tokens are hashed and stored in MongoDB.
+
+- **Refresh**  
+  `POST /api/auth/refresh` rotates the refresh token on each use.  
+  Old tokens are invalidated, new ones are stored.
+
+- **Logout**  
+  `POST /api/auth/logout` clears both cookies and deletes the refresh token from DB.  
+  This ensures sessions cannot be reused after logout.
+
+- **Google & Admin Login**  
+  Both flows now issue access + refresh tokens, aligned with the same rotation/invalidation logic.
+
+### Security Notes
+- All cookies are `httpOnly`, `secure`, and `sameSite` aware.  
+- Refresh tokens are hashed with bcrypt before storage.  
+- Expired or invalid tokens return `403 Forbidden`.
+
+### Testing
+Run the Jest test suite to validate login, refresh, and logout flows:
+
+```bash
+npm test
