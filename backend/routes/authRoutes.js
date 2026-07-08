@@ -13,7 +13,6 @@ import {
 import validateRequest from "../middleware/validateRequest.js";
 import { registerSchema, loginSchema } from "../validators/authSchemas.js";
 import { authIpLimiter, otpIpLimiter } from "../middleware/rateLimiters.js";
-import { protect } from "../middleware/authMiddleware.js";
 
 const authRoutes = express.Router();
 
@@ -67,7 +66,7 @@ authRoutes.post("/login", authIpLimiter, validateRequest(loginSchema), login);
  *       200:
  *         description: Successfully logged out
  */
-authRoutes.post("/logout", protect, logOut);
+authRoutes.post("/logout",  logOut);
 
 /**
  * @swagger
