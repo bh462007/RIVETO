@@ -1,6 +1,4 @@
-import assert from "node:assert/strict";
-import { describe, it } from "node:test";
-
+import { describe, it, expect } from "@jest/globals";
 import User from "../model/userModel.js";
 
 describe("User model auth providers", () => {
@@ -11,7 +9,7 @@ describe("User model auth providers", () => {
       authProvider: "google",
     });
 
-    await assert.doesNotReject(() => googleUser.validate());
+    await expect(googleUser.validate()).resolves.not.toThrow();
   });
 
   it("requires a password for local users", async () => {
@@ -20,8 +18,7 @@ describe("User model auth providers", () => {
       email: "jane.local@example.com",
     });
 
-    await assert.rejects(
-      () => localUser.validate(),
+    await expect(localUser.validate()).rejects.toThrow(
       /Path `password` is required/,
     );
   });

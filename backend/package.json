@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "node --test",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -31,14 +31,20 @@
     "nodemon": "^3.1.10",
     "razorpay": "^2.9.6",
     "react-toastify": "^11.0.5",
+    "sentiment": "^5.0.2",
     "socket.io": "^4.8.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "validator": "^13.15.15"
   },
   "devDependencies": {
-    "eslint": "^9.39.2",
+    "cross-env": "^10.1.0",
+    "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-node": "^11.1.0"
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.5.6",
+    "jest": "^30.4.2",
+    "mongodb-memory-server": "^11.2.0",
+    "supertest": "^7.2.2"
   }
 }

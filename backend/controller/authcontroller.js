@@ -2,7 +2,9 @@ import User from "../model/userModel.js";
 import validator from "validator";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import { genToken, genToken1 } from "../config/Token.js";
+import jwt from "jsonwebtoken";
+import { genToken } from "../config/Token.js";
+import RefreshToken from "../model/RefreshToken.js"; 
 import { sendMail } from "../config/sendEmail.js";
 import generateOTP from "../utils/otp.js";
 import TempUser from "../model/tempUserModel.js";
@@ -11,6 +13,15 @@ import {
   sendNotification,
   emitActivity,
 } from "../services/notificationService.js";
+
+const generateAccessToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "15m" });
+};
+
+const generateRefreshToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+};
+
 
 export const sendOTP = async (req, res) => {
   try {
@@ -118,6 +129,47 @@ export const verifyOTP = async (req, res) => {
     return res.status(500).json({ message: "OTP verification failed" });
   }
 };
+ 
+export const refreshToken = async (req, res) => {
+  const { refreshToken } = req.cookies; 
+  if (!refreshToken) return res.status(400).json({ message: "Refresh token required" });
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const storedToken = await RefreshToken.findOne({ userId: decoded.id });
+
+    if (!storedToken || !(await bcrypt.compare(refreshToken, storedToken.tokenHash))) {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
+    const newAccessToken = generateAccessToken(decoded.id);
+    const newRefreshToken = generateRefreshToken(decoded.id);
+
+    storedToken.tokenHash = await bcrypt.hash(newRefreshToken, 10);
+    storedToken.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await storedToken.save();
+
+    res.cookie("token", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({ message: "Tokens refreshed successfully" });
+  } catch (err) {
+    res.status(403).json({ message: "Expired or invalid refresh token", error: err.message });
+  }
+};
+
+
 
 export const login = async (req, res) => {
   try {
@@ -134,14 +186,33 @@ export const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    const token = genToken(user._id);
-    res.cookie("token", token, {
+  
+    const accessToken = generateAccessToken(user._id);   
+    const refreshToken = generateRefreshToken(user._id); 
+
+   
+    await RefreshToken.create({
+      userId: user._id,
+      tokenHash: await bcrypt.hash(refreshToken, 10),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    
+    res.cookie("token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 15 * 60 * 1000, 
     });
 
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
+    });
+
+    
     emitActivity({
       type: "login",
       user: {
@@ -159,6 +230,8 @@ export const login = async (req, res) => {
   }
 };
 
+
+
 export const googleLogin = async (req, res) => {
   try {
     const { name, email } = req.body;
@@ -168,8 +241,25 @@ export const googleLogin = async (req, res) => {
       user = await User.create({ name, email, authProvider: "google" });
     }
 
-    const token = genToken(user._id);
-    res.cookie("token", token, {
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+   
+    await RefreshToken.create({
+      userId: user._id,
+      tokenHash: await bcrypt.hash(refreshToken, 10),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    
+    res.cookie("token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
@@ -183,18 +273,29 @@ export const googleLogin = async (req, res) => {
   }
 };
 
+
 export const logOut = async (req, res) => {
   try {
+  
+    if (req.user && req.user.id) {
+      await RefreshToken.deleteOne({ userId: req.user.id });
+    }
+
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 0,
+    });
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     emitActivity({
       type: "logout",
-      user: {},
+      user: req.user ? { id: req.user.id, email: req.user.email } : {},
       action: "User logged out",
     });
 
@@ -205,6 +306,7 @@ export const logOut = async (req, res) => {
   }
 };
 
+
 export const adminLogin = async (req, res) => {
   try {
     let { email, password } = req.body;
@@ -212,14 +314,32 @@ export const adminLogin = async (req, res) => {
       email === process.env.ADMIN_EMAIL &&
       password === process.env.ADMIN_PASSWORD
     ) {
-      const token = await genToken1(email);
-      res.cookie("adminToken", token, {
+      
+      const accessToken = generateAccessToken(email);
+      const refreshToken = generateRefreshToken(email);
+
+      
+      await RefreshToken.create({
+        userId: email,
+        tokenHash: await bcrypt.hash(refreshToken, 10),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      });
+
+      res.cookie("adminToken", accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        maxAge: 1 * 24 * 60 * 60 * 1000,
+        maxAge: 15 * 60 * 1000,
       });
-      return res.status(200).json(token);
+
+      res.cookie("adminRefreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      return res.status(200).json({ message: "Admin logged in successfully" });
     }
     return res.status(400).json({ message: "Invalid admin credentials" });
   } catch (_error) {
@@ -227,6 +347,7 @@ export const adminLogin = async (req, res) => {
     return res.status(500).json({ message: `admin login error: ${_error}` });
   }
 };
+
 
 export const forgotPassword = async (req, res) => {
   try {

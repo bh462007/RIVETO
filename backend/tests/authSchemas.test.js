@@ -1,6 +1,4 @@
-import assert from "node:assert/strict";
-import { describe, it } from "node:test";
-
+import { describe, it, expect } from "@jest/globals";
 import {
   addReviewSchema,
   addToCartSchema,
@@ -13,7 +11,6 @@ const validObjectId = "507f1f77bcf86cd799439011";
 
 const getErrorDetails = (schema, payload) => {
   const { error } = schema.validate(payload, { abortEarly: false });
-
   return error?.details.map(({ path, type, message }) => ({
     path: path.join("."),
     type,
@@ -36,30 +33,19 @@ describe("registerSchema", () => {
 
   it("accepts a valid registration payload", () => {
     const { error, value } = registerSchema.validate(validRegistration);
-
-    assert.equal(error, undefined);
-    assert.deepEqual(value, validRegistration);
+    expect(error).toBeUndefined();
+    expect(value).toEqual(validRegistration);
   });
 
   it("accepts boundary values for name and password length", () => {
-    const minimumPayload = {
-      name: "Jon",
-      email: "jon@example.com",
-      password: "12345678",
-    };
-
-    const maximumPayload = {
-      name: "A".repeat(30),
-      email: "avery@example.com",
-      password: "12345678",
-    };
-
-    assert.equal(registerSchema.validate(minimumPayload).error, undefined);
-    assert.equal(registerSchema.validate(maximumPayload).error, undefined);
+    const minimumPayload = { name: "Jon", email: "jon@example.com", password: "12345678" };
+    const maximumPayload = { name: "A".repeat(30), email: "avery@example.com", password: "12345678" };
+    expect(registerSchema.validate(minimumPayload).error).toBeUndefined();
+    expect(registerSchema.validate(maximumPayload).error).toBeUndefined();
   });
 
   it("rejects missing required fields with custom messages", () => {
-    assert.deepEqual(getErrorMessages(registerSchema, {}), [
+    expect(getErrorMessages(registerSchema, {})).toEqual([
       "Name is a required field",
       "Email is a required field",
       "Password is a required field",
@@ -67,28 +53,13 @@ describe("registerSchema", () => {
   });
 
   it("rejects empty strings and invalid formats", () => {
-    const payload = {
-      name: "",
-      email: "not-an-email",
-      password: "short",
-    };
-
-    assert.deepEqual(getErrorTypes(registerSchema, payload), [
-      {
-        path: "name",
-        type: "string.empty",
-      },
-      {
-        path: "email",
-        type: "string.email",
-      },
-      {
-        path: "password",
-        type: "string.min",
-      },
+    const payload = { name: "", email: "not-an-email", password: "short" };
+    expect(getErrorTypes(registerSchema, payload)).toEqual([
+      { path: "name", type: "string.empty" },
+      { path: "email", type: "string.email" },
+      { path: "password", type: "string.min" },
     ]);
-
-    assert.deepEqual(getErrorMessages(registerSchema, payload), [
+    expect(getErrorMessages(registerSchema, payload)).toEqual([
       "Name cannot be empty",
       "Please provide a valid email address",
       "Password must be at least 8 characters long",
@@ -96,139 +67,71 @@ describe("registerSchema", () => {
   });
 
   it("rejects empty email and password strings", () => {
-    assert.deepEqual(getErrorTypes(registerSchema, {
-      name: "Jane Doe",
-      email: "",
-      password: "",
-    }), [
-      {
-        path: "email",
-        type: "string.empty",
-      },
-      {
-        path: "password",
-        type: "string.empty",
-      },
+    expect(getErrorTypes(registerSchema, { name: "Jane Doe", email: "", password: "" })).toEqual([
+      { path: "email", type: "string.empty" },
+      { path: "password", type: "string.empty" },
     ]);
   });
 
   it("rejects names outside the configured length boundaries", () => {
-    assert.deepEqual(getErrorDetails(registerSchema, {
-      ...validRegistration,
-      name: "Al",
-    }), [
-      {
-        path: "name",
-        type: "string.min",
-        message: "Name must be at least 3 characters",
-      },
+    expect(getErrorDetails(registerSchema, { ...validRegistration, name: "Al" })).toEqual([
+      { path: "name", type: "string.min", message: "Name must be at least 3 characters" },
     ]);
-
-    assert.deepEqual(getErrorTypes(registerSchema, {
-      ...validRegistration,
-      name: "A".repeat(31),
-    }), [
-      {
-        path: "name",
-        type: "string.max",
-      },
+    expect(getErrorTypes(registerSchema, { ...validRegistration, name: "A".repeat(31) })).toEqual([
+      { path: "name", type: "string.max" },
     ]);
   });
 });
 
 describe("loginSchema", () => {
   it("accepts a valid login payload", () => {
-    const payload = {
-      email: "jane@example.com",
-      password: "password123",
-    };
-
+    const payload = { email: "jane@example.com", password: "password123" };
     const { error, value } = loginSchema.validate(payload);
-
-    assert.equal(error, undefined);
-    assert.deepEqual(value, payload);
+    expect(error).toBeUndefined();
+    expect(value).toEqual(payload);
   });
 
   it("rejects missing required fields", () => {
-    assert.deepEqual(getErrorDetails(loginSchema, {}), [
-      {
-        path: "email",
-        type: "any.required",
-        message: "Email is a required field",
-      },
-      {
-        path: "password",
-        type: "any.required",
-        message: "\"password\" is required",
-      },
+    expect(getErrorDetails(loginSchema, {})).toEqual([
+      { path: "email", type: "any.required", message: "Email is a required field" },
+      { path: "password", type: "any.required", message: "\"password\" is required" },
     ]);
   });
 
   it("rejects invalid email and short password values", () => {
-    const payload = {
-      email: "invalid-email",
-      password: "short",
-    };
-
-    assert.deepEqual(getErrorTypes(loginSchema, payload), [
-      {
-        path: "email",
-        type: "string.email",
-      },
-      {
-        path: "password",
-        type: "string.min",
-      },
+    const payload = { email: "invalid-email", password: "short" };
+    expect(getErrorTypes(loginSchema, payload)).toEqual([
+      { path: "email", type: "string.email" },
+      { path: "password", type: "string.min" },
     ]);
-
-    assert.equal(
-      getErrorMessages(loginSchema, payload)[0],
-      "Please provide a valid email address",
-    );
+    expect(getErrorMessages(loginSchema, payload)[0]).toBe("Please provide a valid email address");
   });
 
   it("rejects empty email and password strings", () => {
-    assert.deepEqual(getErrorTypes(loginSchema, {
-      email: "",
-      password: "",
-    }), [
-      {
-        path: "email",
-        type: "string.empty",
-      },
-      {
-        path: "password",
-        type: "string.empty",
-      },
+    expect(getErrorTypes(loginSchema, { email: "", password: "" })).toEqual([
+      { path: "email", type: "string.empty" },
+      { path: "password", type: "string.empty" },
     ]);
   });
 });
 
 describe("addToCartSchema", () => {
   it("accepts a valid cart item payload", () => {
-    const payload = {
-      itemId: validObjectId,
-      size: "M",
-    };
-
+    const payload = { itemId: validObjectId, size: "M" };
     const { error, value } = addToCartSchema.validate(payload);
-
-    assert.equal(error, undefined);
-    assert.deepEqual(value, payload);
+    expect(error).toBeUndefined();
+    expect(value).toEqual(payload);
   });
 
   it("rejects missing item and size fields with custom messages", () => {
-    assert.deepEqual(getErrorMessages(addToCartSchema, {}), [
+    expect(getErrorMessages(addToCartSchema, {})).toEqual([
       "Item ID is required",
       "Size is required",
     ]);
   });
 
   it("rejects empty item and size values with custom messages", () => {
-    assert.deepEqual(getErrorMessages(addToCartSchema, {
-      itemId: "",
-      size: "",
-    }), [
+    expect(getErrorMessages(addToCartSchema, { itemId: "", size: "" })).toEqual([
       "Item ID cannot be empty",
       "Size cannot be empty",
     ]);
@@ -236,22 +139,15 @@ describe("addToCartSchema", () => {
 });
 
 describe("updateCartSchema", () => {
-  const validUpdate = {
-    itemId: validObjectId,
-    size: "L",
-    quantity: 1,
-  };
+  const validUpdate = { itemId: validObjectId, size: "L", quantity: 1 };
 
   it("accepts valid quantity boundary values", () => {
-    assert.equal(updateCartSchema.validate(validUpdate).error, undefined);
-    assert.equal(updateCartSchema.validate({
-      ...validUpdate,
-      quantity: 0,
-    }).error, undefined);
+    expect(updateCartSchema.validate(validUpdate).error).toBeUndefined();
+    expect(updateCartSchema.validate({ ...validUpdate, quantity: 0 }).error).toBeUndefined();
   });
 
   it("rejects missing fields with custom messages", () => {
-    assert.deepEqual(getErrorMessages(updateCartSchema, {}), [
+    expect(getErrorMessages(updateCartSchema, {})).toEqual([
       "Item ID is required",
       "Size is required",
       "Quantity is required",
@@ -259,76 +155,34 @@ describe("updateCartSchema", () => {
   });
 
   it("rejects invalid item, size, and quantity values", () => {
-    assert.deepEqual(getErrorDetails(updateCartSchema, {
-      itemId: "",
-      size: "",
-      quantity: -1,
-    }), [
-      {
-        path: "itemId",
-        type: "string.empty",
-        message: "Item ID cannot be empty",
-      },
-      {
-        path: "size",
-        type: "string.empty",
-        message: "Size cannot be empty",
-      },
-      {
-        path: "quantity",
-        type: "number.min",
-        message: "Quantity must be at least 0",
-      },
+    expect(getErrorDetails(updateCartSchema, { itemId: "", size: "", quantity: -1 })).toEqual([
+      { path: "itemId", type: "string.empty", message: "Item ID cannot be empty" },
+      { path: "size", type: "string.empty", message: "Size cannot be empty" },
+      { path: "quantity", type: "number.min", message: "Quantity must be at least 0" },
     ]);
   });
 
   it("rejects non-numeric and non-integer quantity values", () => {
-    assert.deepEqual(getErrorDetails(updateCartSchema, {
-      ...validUpdate,
-      quantity: "many",
-    }), [
-      {
-        path: "quantity",
-        type: "number.base",
-        message: "Quantity must be a number",
-      },
+    expect(getErrorDetails(updateCartSchema, { ...validUpdate, quantity: "many" })).toEqual([
+      { path: "quantity", type: "number.base", message: "Quantity must be a number" },
     ]);
-
-    assert.deepEqual(getErrorTypes(updateCartSchema, {
-      ...validUpdate,
-      quantity: 1.5,
-    }), [
-      {
-        path: "quantity",
-        type: "number.integer",
-      },
+    expect(getErrorTypes(updateCartSchema, { ...validUpdate, quantity: 1.5 })).toEqual([
+      { path: "quantity", type: "number.integer" },
     ]);
   });
 });
 
 describe("addReviewSchema", () => {
-  const validReview = {
-    productId: validObjectId,
-    rating: 5,
-    comment: "Great product",
-  };
+  const validReview = { productId: validObjectId, rating: 5, comment: "Great product" };
 
   it("accepts valid rating and comment boundary values", () => {
-    assert.equal(addReviewSchema.validate(validReview).error, undefined);
-    assert.equal(addReviewSchema.validate({
-      ...validReview,
-      rating: 1,
-      comment: "abc",
-    }).error, undefined);
-    assert.equal(addReviewSchema.validate({
-      ...validReview,
-      rating: 5,
-      comment: "A".repeat(1000),
-    }).error, undefined);
+    expect(addReviewSchema.validate(validReview).error).toBeUndefined();
+    expect(addReviewSchema.validate({ ...validReview, rating: 1, comment: "abc" }).error).toBeUndefined();
+    expect(addReviewSchema.validate({ ...validReview, rating: 5, comment: "A".repeat(1000) }).error).toBeUndefined();
   });
 
   it("rejects missing fields with custom messages", () => {
-    assert.deepEqual(getErrorMessages(addReviewSchema, {}), [
+    expect(getErrorMessages(addReviewSchema, {})).toEqual([
       "Product ID is required",
       "Rating is required",
       "Comment is required",
@@ -336,56 +190,25 @@ describe("addReviewSchema", () => {
   });
 
   it("rejects invalid ObjectIds and empty comments with custom messages", () => {
-    assert.deepEqual(getErrorDetails(addReviewSchema, {
-      productId: "not-a-valid-object-id",
-      rating: 3,
-      comment: "",
-    }), [
-      {
-        path: "productId",
-        type: "string.pattern.base",
-        message: "Product ID must be a valid MongoDB ObjectId",
-      },
-      {
-        path: "comment",
-        type: "string.empty",
-        message: "Comment cannot be empty",
-      },
+    expect(getErrorDetails(addReviewSchema, { productId: "not-a-valid-object-id", rating: 3, comment: "" })).toEqual([
+      { path: "productId", type: "string.pattern.base", message: "Product ID must be a valid MongoDB ObjectId" },
+      { path: "comment", type: "string.empty", message: "Comment cannot be empty" },
     ]);
   });
 
   it("rejects rating boundary violations and non-integer values", () => {
-    assert.deepEqual(getErrorMessages(addReviewSchema, {
-      ...validReview,
-      rating: 0,
-    }), ["Rating must be at least 1"]);
-
-    assert.deepEqual(getErrorMessages(addReviewSchema, {
-      ...validReview,
-      rating: 6,
-    }), ["Rating cannot exceed 5"]);
-
-    assert.deepEqual(getErrorMessages(addReviewSchema, {
-      ...validReview,
-      rating: 3.5,
-    }), ["Rating must be a whole number"]);
+    expect(getErrorMessages(addReviewSchema, { ...validReview, rating: 0 })).toEqual(["Rating must be at least 1"]);
+    expect(getErrorMessages(addReviewSchema, { ...validReview, rating: 6 })).toEqual(["Rating cannot exceed 5"]);
+    expect(getErrorMessages(addReviewSchema, { ...validReview, rating: 3.5 })).toEqual(["Rating must be a whole number"]);
   });
 
   it("rejects comment length boundary violations after trimming", () => {
-    assert.deepEqual(getErrorDetails(addReviewSchema, {
-      ...validReview,
-      comment: " ab ",
-    }), [
-      {
-        path: "comment",
-        type: "string.min",
-        message: "Comment must be at least 3 characters",
-      },
+    expect(getErrorDetails(addReviewSchema, { ...validReview, comment: " ab " })).toEqual([
+      { path: "comment", type: "string.min", message: "Comment must be at least 3 characters" },
     ]);
-
-    assert.deepEqual(getErrorMessages(addReviewSchema, {
-      ...validReview,
-      comment: "A".repeat(1001),
-    }), ["Comment cannot exceed 1000 characters"]);
+    expect(getErrorMessages(addReviewSchema, { ...validReview, comment: "A".repeat(1001) })).toEqual([
+      "Comment cannot exceed 1000 characters",
+    ]);
   });
 });
+

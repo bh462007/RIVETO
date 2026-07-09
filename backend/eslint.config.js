@@ -7,8 +7,11 @@ export default [
     files: ["**/*.js"],
     languageOptions: {
       ecmaVersion: "latest",
-      globals: globals.node,
       sourceType: "module",
+      globals: {
+        ...globals.node,
+        ...globals.jest   
+      }
     },
     rules: {
       ...js.configs.recommended.rules,
