@@ -126,15 +126,35 @@ export const addProduct = async (req, res) => {
 export default addProduct;
 
 export const listProducts = async (req, res) => {
-  try {
-    const page = Math.max(1, Number(req.query.page) || 1);
-    const limit = Math.min(Math.max(1, Number(req.query.limit) || 20), 100);
-    const skip = (page - 1) * limit;
+    try {
+      const page = Math.max(1, Number(req.query.page) || 1);
+      const limit = Math.min(Math.max(1, Number(req.query.limit) || 20), 100);
+      const skip = (page - 1) * limit;
 
-    const [products, total] = await Promise.all([
-  Product.find({}).sort({ _id: 1 }).skip(skip).limit(limit).lean(),
-  Product.countDocuments({}),
-]);
+      const { category, subCategory, minPrice, maxPrice, search, sort } = req.query;
+
+      const filter = {};
+      if (category) filter.category = category;
+      if (subCategory) filter.subCategory = subCategory;
+      if (minPrice || maxPrice) {
+        filter.price = {};
+        if (minPrice) filter.price.$gte = Number(minPrice);
+        if (maxPrice) filter.price.$lte = Number(maxPrice);
+      }
+      if (search) filter.name = { $regex: search, $options: "i" };
+
+      const sortMap = {
+        price_asc: { price: 1 },
+        price_desc: { price: -1 },
+        newest: { createdAt: -1 },
+      };
+      const sortOption = sortMap[sort] || { _id: 1 };
+
+      const [products, total] = await Promise.all([
+    Product.find(filter).sort(sortOption).skip(skip).limit(limit).lean(),
+    Product.countDocuments(filter),
+  ]);
+  
 const productsWithReviewCount = await Promise.all(
   products.map(async (product) => {
     const reviewCount = await Review.countDocuments({
