@@ -63,6 +63,8 @@ if (fs.existsSync(frontendBuildPath)) {
   });
 }
 
+app.use(errorHandler);
+
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
