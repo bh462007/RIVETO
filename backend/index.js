@@ -11,7 +11,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import reviewRoutes from "./routes/reviewRoute.js";
 import wishlistRouter from "./routes/wishlistRoutes.js";
 import recommendationsRoute from "./routes/recommendations.js";
-import { globalIpLimiter } from "./middleware/rateLimiters.js";
+
 import errorHandler from "./middleware/errorHandler.js";
 import notificationRouter from "./routes/notificationRoutes.js";
 import botRoute from "./routes/bot.js";
