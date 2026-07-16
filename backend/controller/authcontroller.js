@@ -300,6 +300,18 @@ export const logOut = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
+    res.clearCookie("adminToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+
+    res.clearCookie("adminRefreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+
     emitActivity({
       type: "logout",
       user: req.user ? { id: req.user.id, email: req.user.email } : {},
@@ -324,13 +336,6 @@ export const adminLogin = async (req, res) => {
       
       const accessToken = generateAccessToken(email);
       const refreshToken = generateRefreshToken(email);
-
-      
-      await RefreshToken.create({
-        userId: email,
-        tokenHash: await bcrypt.hash(refreshToken, 10),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      });
 
       res.cookie("adminToken", accessToken, {
         httpOnly: true,
