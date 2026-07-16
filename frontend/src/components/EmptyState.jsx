@@ -1,5 +1,3 @@
-import React from 'react';
-
 const EmptyState = ({ 
   title = "No Data Found", 
   description = "There is currently no information available to display here.", 
